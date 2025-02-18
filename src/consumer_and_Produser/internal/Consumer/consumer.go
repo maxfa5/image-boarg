@@ -36,7 +36,7 @@ func NewConsumerService(logger *slog.Logger, cfg config.Consumer) (*ConsumerServ
 
 func connToKafkaTopic(cfg config.Consumer) (*kafka.Consumer, error) {
 	config := &kafka.ConfigMap{
-		"bootstrap.servers": "cfg.Brokers",
+		"bootstrap.servers": cfg.Brokers,
 		"group.id":          "my-group",
 		"auto.offset.reset": "earliest",
 	}
@@ -53,7 +53,6 @@ func connToKafkaTopic(cfg config.Consumer) (*kafka.Consumer, error) {
 		consumer.Close()
 		fmt.Printf("error retrieving meta: %v", err)
 	}
-	fmt.Printf("!!!!!!!!!!!!!!")
 
 	err = consumer.SubscribeTopics([]string{cfg.Topic}, nil)
 	if err != nil {
