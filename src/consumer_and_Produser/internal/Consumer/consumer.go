@@ -2,9 +2,7 @@ package consumer
 
 import (
 	"fmt"
-	database "kafka_with_go/internal/Dbconnect"
 	"kafka_with_go/internal/config"
-	"log"
 	"log/slog"
 	"time"
 
@@ -39,29 +37,28 @@ func NewConsumerService(logger *slog.Logger, cfg config.Consumer) (*ConsumerServ
 func connToKafkaTopic(cfg config.Consumer) (*kafka.Consumer, error) {
 	config := &kafka.ConfigMap{
 		"bootstrap.servers": cfg.Brokers,
-		"group.id":          cfg.GroupId,
+		"group.id":          "my-group",
 		"auto.offset.reset": "earliest",
 	}
 
 	consumer, err := kafka.NewConsumer(config)
-
 	for err != nil || consumer == nil {
-		consumer, err := kafka.NewConsumer(config)
+		consumer, err = kafka.NewConsumer(config)
 		if err != nil {
 			fmt.Printf("error creating kafka consumer: %v", err)
 		}
+	}
+	_, err = consumer.GetMetadata(nil, true, 500)
+	if err != nil {
+		consumer.Close()
+		fmt.Printf("error retrieving meta: %v", err)
+	}
+	fmt.Printf("!!!!!!!!!!!!!!")
 
-		_, err = consumer.GetMetadata(nil, true, 500)
-		if err != nil {
-			consumer.Close()
-			fmt.Printf("error retrieving meta: %v", err)
-		}
-
-		err = consumer.SubscribeTopics([]string{cfg.Topic}, nil)
-		if err != nil {
-			consumer.Close()
-			fmt.Printf("error subscribing to topic: %v", err)
-		}
+	err = consumer.SubscribeTopics([]string{cfg.Topic}, nil)
+	if err != nil {
+		consumer.Close()
+		fmt.Printf("error subscribing to topic: %v", err)
 	}
 	return consumer, nil
 }
@@ -71,10 +68,10 @@ func (c *ConsumerService) LoopGetMsg() {
 	c.logger = slog.With(
 		slog.String("op", op),
 	)
-	err := database.InitDB(c.logger, "postgres://postgres:4738@192.168.189.230:5433")
-	if err != nil {
-		log.Fatalf("Ошибка инициализации базы данных: %v", err)
-	}
+	// err := database.InitDB(c.logger, "postgres://postgres:4738@192.168.189.230:5433")
+	// if err != nil {
+	// 	log.Fatalf("Ошибка инициализации базы данных: %v", err)
+	// }
 	for {
 		select {
 		case <-c.stop:

@@ -23,7 +23,7 @@ services:
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       KAFKA_KRAFT_CLUSTER_ID: "${CLUSTER_ID:-$(uuidgen)}"
     networks:
-      - kafka-network
+      - network
     volumes:
       - kafka_data1:/kafka/data
 
@@ -48,7 +48,7 @@ services:
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       KAFKA_KRAFT_CLUSTER_ID: "${CLUSTER_ID:-$(uuidgen)}"
     networks:
-      - kafka-network
+      - network
     volumes:
       - kafka_data2:/kafka/data
 
@@ -73,7 +73,7 @@ services:
       KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       KAFKA_KRAFT_CLUSTER_ID: "${CLUSTER_ID:-$(uuidgen)}"
     networks:
-      - kafka-network
+      - network
     volumes:
       - kafka_data3:/kafka/data
 
@@ -83,21 +83,30 @@ services:
       - "9020:8080"  # Порт для доступа к Kafka UI
     environment:
       KAFKA_CLUSTERS_0_NAME: postgres_connect_01
-      KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: "broker1:29092,broker2:29093,broker3:29091"
+      KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: "broker1:29092,broker2:29093,broker3:29094"
     depends_on:
       - broker1
       - broker2
       - broker3
     networks:
-      - kafka-network
+      - network
     healthcheck:
       test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:9020/actuator/health"] #лучше использовать curl, но его нужно устанавливать в образ
       interval: 10s
       timeout: 3s
       retries: 2
 
+#   consumer:
+#     image: consumer:latest
+#     # build:
+#     #   context: consumer_and_Produser 
+#     #   dockerfile:  Dockerfile.consumer
+#     command: ./consumer
+#     networks:
+#       - network
+
 networks:
-  kafka-network:
+  network:
     driver: bridge
 
 volumes:

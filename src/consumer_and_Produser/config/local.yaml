@@ -1,5 +1,5 @@
 consumer_1:
-  env: broker3:9092,broker2:9093,broker1:9091
+  env:  broker1:29092, broker2:29093, broker3:29094
   consumer_group: test_group
   message_topic: orders 
 

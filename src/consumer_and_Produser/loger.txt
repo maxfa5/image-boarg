@@ -1,2 +1,0 @@
-{"time":"2025-02-16T16:20:46.362451226+05:00","level":"ERROR","msg":"Ошибка подключения к Kafka","error":"error retrieving meta: Local: Broker transport failure"}
-{"time":"2025-02-16T16:20:46.362519518+05:00","level":"ERROR","msg":"error in create Consumer: ","error":"error retrieving meta: Local: Broker transport failure"}

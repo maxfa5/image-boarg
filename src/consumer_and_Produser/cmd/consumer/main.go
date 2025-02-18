@@ -15,6 +15,8 @@ func main() {
 	if err != nil {
 		fmt.Println("error in logger")
 	}
+	fmt.Printf("1выфыфв")
+
 	defer file.Close()
 	logger := slog.New(slog.NewJSONHandler(file, nil))
 	cfg := config.EnvLoad()
