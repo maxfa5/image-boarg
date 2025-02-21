@@ -2,7 +2,10 @@ package consumer
 
 import (
 	"fmt"
+	curd "kafka_with_go/internal/CURD"
+	database "kafka_with_go/internal/Dbconnect"
 	"kafka_with_go/internal/config"
+	"log"
 	"log/slog"
 	"time"
 
@@ -67,10 +70,11 @@ func (c *ConsumerService) LoopGetMsg() {
 	c.logger = slog.With(
 		slog.String("op", op),
 	)
-	// err := database.InitDB(c.logger, "postgres://postgres:4738@192.168.189.230:5433")
-	// if err != nil {
-	// 	log.Fatalf("Ошибка инициализации базы данных: %v", err)
-	// }
+	// err := database.InitDB(c.logger, "postgres://myuser:mypassword@postgres_container:5432/mydatabase")
+	err := database.InitDB(c.logger, "postgres://myuser:mypassword@localhost:5430/mydatabase")
+	if err != nil {
+		log.Fatalf("Ошибка инициализации базы данных: %v", err)
+	}
 	for {
 		select {
 		case <-c.stop:
@@ -86,6 +90,7 @@ func (c *ConsumerService) LoopGetMsg() {
 				err = fmt.Errorf("error while reading from kafka: %w", err)
 				c.logger.Error("Error while reading from kafka", slog.String("error", err.Error()))
 			}
+			go curd.HandleKafkaMessage(c.logger, msg)
 			c.logger.Info("Message received", slog.String("topic", *msg.TopicPartition.Topic),
 				slog.Int("partition", int(msg.TopicPartition.Partition)),
 				slog.Any("offset", msg.TopicPartition.Offset),

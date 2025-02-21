@@ -1,6 +1,0 @@
-CREATE TABLE IF NOT EXISTS messages (
-    id SERIAL PRIMARY KEY  NOT NULL,
-    content TEXT NOT NULL,
-    chat_id INT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);

@@ -1,5 +1,7 @@
 consumer_1:
-  env:  broker1:29092, broker2:29093, broker3:29094
+  # env:  broker1:29092, broker2:29093, broker3:29094
+  env:  localhost:9092, localhost:9093, localhost:9094
+
   consumer_group: test_group
   message_topic: orders 
 

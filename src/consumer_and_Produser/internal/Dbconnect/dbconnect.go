@@ -3,7 +3,6 @@ package dbconnect
 import (
 	"context"
 	"fmt"
-	"log"
 	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -16,17 +15,10 @@ func InitDB(logger *slog.Logger, connectionString string) error {
 	var err error
 	dbPool, err = pgxpool.New(context.Background(), connectionString)
 	if err != nil {
-		logger.Error("Ошибка подключения к Kafka", slog.String("error", err.Error()))
-		return fmt.Errorf("не удалось подключиться к базе данных: %w", err)
+		logger.Error("Не удалось подключиться к базе данных", slog.String("error", err.Error()))
+		return fmt.Errorf("Не удалось подключиться к базе данных: %w", err)
 	}
-	query := "INSERT INTO public.threads(name, id_theme) VALUES ('test1', 1);"
-
-	_, err = dbPool.Exec(context.Background(), query)
-	if err != nil {
-		log.Printf("Error inserting thread: %v", err)
-		return err
-	}
-	fmt.Println("Thread created successfully")
+	fmt.Println("DB successfully connect")
 	return nil
 }
 
