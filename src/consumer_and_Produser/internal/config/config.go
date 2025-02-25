@@ -11,22 +11,22 @@ import (
 )
 
 type Config struct {
-	FirstConsumer Consumer `yaml:"consumer_1" env-required:"true"`
-	HTTPServer    `yaml:"http_server" env-required:"true"`
-	DataBase      `yaml:`
+	FirstConsumer Consumer
+	HTTPServer
+	DataBase
 }
 type Consumer struct {
-	Brokers string `yaml:"env" env-required:"true"`
-	GroupId string `yaml:"consumer_group" env-required:"true"`
-	Topic   string `yaml:"message_topic" env-required:"true"`
+	Brokers string `env:"BROKERS_ADDRESSES" env-required:"true"`
+	GroupId string `env:"CONSUMER_GROUP" env-required:"true"`
+	Topic   string `env:"MESSAGE_TOPIC" env-required:"true"`
 }
 type DataBase struct {
-	Username string `envconfig:"DB_USERNAME" env-default:"myuser"`
-	Password string `envconfig:"DB_PASSWORD"  env-default:"mypassword"`
-	Host     string `envconfig:"DB_HOST" env-default:"localhost"`
-	Port     string `envconfig:"DB_PORT" env-default:"5430"`
-	DBName   string `envconfig:"DB_NAME" env-default:"mydatabase"`
-	SSLMode  string `envconfig:"DB_SSLMODE" env-default:"require"`
+	Username string `env:"DB_USERNAME" env-required:"true" env-default:"myuser"`
+	Password string `env:"DB_PASSWORD"  env-default:"mypassword"`
+	Host     string `env:"DB_HOST" env-default:"localhost"`
+	Port     string `env:"DB_PORT" env-default:"5430"`
+	DBName   string `env:"DB_NAME" env-default:"mydatabase"`
+	SSLMode  string `env:"DB_SSLMODE" env-default:"require"`
 }
 type HTTPServer struct {
 	Host        string        `yaml:"host" env-required:"true"`
@@ -45,9 +45,6 @@ func EnvLoad() (*Config, *DataBase) {
 	if configPath == "" {
 		log.Fatal("CONFIG_PATH is not set")
 	}
-	// log.Printf("DataBase configuration: %+v\n", os.Getenv("DB_USERNAME"))
-	// os.Setenv("DB_PORT", "5050")
-
 	db, err := EnvLoadDb()
 	if err != nil {
 		log.Fatal("err db %w\n", err)
@@ -63,6 +60,8 @@ func EnvLoadDb() (*DataBase, error) {
 	if err := cleanenv.ReadEnv(&dbConfig); err != nil {
 		return &dbConfig, fmt.Errorf("failed to load database configuration from environment: %w", err)
 	}
+	// fmt.Println(dbConfig)
+
 	return &dbConfig, nil
 
 }
@@ -74,8 +73,11 @@ func EnvLoadInPath(configPath string) *Config {
 
 	var cfg Config
 
-	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
-		log.Fatal("failed to read config, error: ", err)
+	if err := cleanenv.ReadConfig(configPath, &cfg.HTTPServer); err != nil { // Загружаем только HTTPServer
+		fmt.Printf("failed to read config, error: %+v\n", err) // Возвращаем ошибку, а не вызываем log.Fatal
+	}
+	if err := cleanenv.ReadEnv(&cfg.FirstConsumer); err != nil {
+		log.Fatalf("failed to load consumer configuration from environment: %v\n", err)
 	}
 
 	return &cfg

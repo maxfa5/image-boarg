@@ -38,7 +38,7 @@ func NewConsumerService(logger *slog.Logger, cfg config.Consumer) (*ConsumerServ
 func connToKafkaTopic(cfg config.Consumer) (*kafka.Consumer, error) {
 	config := &kafka.ConfigMap{
 		"bootstrap.servers": cfg.Brokers,
-		"group.id":          "my-group",
+		"group.id":          cfg.GroupId,
 		"auto.offset.reset": "earliest",
 	}
 

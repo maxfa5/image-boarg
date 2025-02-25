@@ -2,17 +2,29 @@ networks:
   consumer_and_produser_network:
     external: true
 services:
-  # consumer:
-  #   image: consumer:latest
-  #   # build:
-  #   #   context: consumer_and_Produser 
-  #   #   dockerfile:  Dockerfile.consumer
-  #   command: ./consumer
-  #   networks:
-  #     - consumer_and_produser_network
-  #   volumes:
-  #     - ./logs:/app/logs
-  #   working_dir: /app
+  consumer:
+    image: consumer:latest
+    # build:
+    #   context: consumer_and_Produser 
+    #   dockerfile:  Dockerfile.consumer
+    command: ./consumer
+    environment:
+      BROKERS_ADDRESSES: broker1:29092,broker2:29093,broker3:29094
+      DB_USERNAME: myuser
+      DB_PASSWORD: mypassword
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: mydatabase
+      DB_SSLMODE: disable
+
+    networks:
+      - consumer_and_produser_network
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+    working_dir: /app
   postgres:
     image: postgres:latest
     container_name: postgres_container
@@ -20,6 +32,8 @@ services:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: mydatabase
+      DB_HOST: postgres_container
+      DB_PORT: 5432
     ports:
       - "5430:5432"
     volumes:
@@ -27,6 +41,11 @@ services:
       - ./consumer&Produser/config/init.sql:/docker-entrypoint-initdb.d/init.sql 
     networks:
       - consumer_and_produser_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
+      interval: 7s
+      timeout: 3s
+      retries: 5
 
 volumes:
   postgres_data:

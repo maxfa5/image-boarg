@@ -17,7 +17,6 @@ func main() {
 	if err != nil {
 		fmt.Println("error in logger")
 	}
-	fmt.Printf("1выфыфв")
 
 	defer file.Close()
 	logger := slog.New(slog.NewJSONHandler(file, nil))
@@ -27,6 +26,7 @@ func main() {
 		logger.Error("error in create Consumer: ", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
+
 	connectionString := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s",
 		db_info.Username,
@@ -35,9 +35,8 @@ func main() {
 		db_info.Port,
 		db_info.DBName,
 	)
-	fmt.Println("Connection string:", connectionString) // Добавьте эту строку для отладки
+	log.Println("Connection string:", connectionString)
 
-	// err := database.InitDB(c.logger, "postgres://myuser:mypassword@postgres_container:5432/mydatabase")
 	err = database.InitDB(logger, connectionString)
 	if err != nil {
 		log.Fatalf("Ошибка инициализации базы данных: %v", err)
