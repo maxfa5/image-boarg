@@ -1,2 +1,0 @@
-{"time":"2025-02-25T22:02:08.563008892+05:00","level":"INFO","msg":"Consumer успешно подключен к Kafka. Ожидание сообщений..."}
-{"time":"2025-02-25T22:02:28.539047587+05:00","level":"INFO","msg":"stoppping server","signal":"interrupt"}

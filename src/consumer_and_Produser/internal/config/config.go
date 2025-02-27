@@ -36,7 +36,7 @@ type HTTPServer struct {
 	IdleTimeout time.Duration `yaml:"idle_timeout" env-required:"true"`
 }
 
-func EnvLoad() (*Config, *DataBase) {
+func EnvLoad() *Config {
 	if err := godotenv.Load(".env"); err != nil {
 		log.Fatal("failed to load environment file, error: ", err)
 	}
@@ -45,13 +45,9 @@ func EnvLoad() (*Config, *DataBase) {
 	if configPath == "" {
 		log.Fatal("CONFIG_PATH is not set")
 	}
-	db, err := EnvLoadDb()
-	if err != nil {
-		log.Fatal("err db %w\n", err)
-	}
-	log.Printf("DataBase configuration: %+v\n", db)
+
 	cfg := EnvLoadInPath(configPath)
-	return cfg, db
+	return cfg
 }
 func EnvLoadDb() (*DataBase, error) {
 
@@ -80,5 +76,12 @@ func EnvLoadInPath(configPath string) *Config {
 		log.Fatalf("failed to load consumer configuration from environment: %v\n", err)
 	}
 
+	var db *DataBase
+	db, err := EnvLoadDb()
+	if err != nil {
+		log.Fatal("err db %w\n", err)
+	}
+	cfg.DataBase = *db
+	log.Printf("DataBase configuration: %+v\n", cfg.DataBase)
 	return &cfg
 }

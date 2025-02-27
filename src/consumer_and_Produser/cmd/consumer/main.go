@@ -20,24 +20,14 @@ func main() {
 
 	defer file.Close()
 	logger := slog.New(slog.NewJSONHandler(file, nil))
-	cfg, db_info := config.EnvLoad()
+	cfg := config.EnvLoad()
 	consumerService, err := consumer.NewConsumerService(logger, cfg.FirstConsumer)
 	if err != nil {
 		logger.Error("error in create Consumer: ", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
 
-	connectionString := fmt.Sprintf(
-		"postgres://%s:%s@%s:%s/%s",
-		db_info.Username,
-		db_info.Password,
-		db_info.Host,
-		db_info.Port,
-		db_info.DBName,
-	)
-	log.Println("Connection string:", connectionString)
-
-	err = database.InitDB(logger, connectionString)
+	err = database.InitDB(logger, cfg.DataBase)
 	if err != nil {
 		log.Fatalf("Ошибка инициализации базы данных: %v", err)
 	}
