@@ -20,7 +20,7 @@ func main() {
 
 	defer file.Close()
 	logger := slog.New(slog.NewJSONHandler(file, nil))
-	cfg := config.EnvLoad()
+	cfg := config.EnvLoad(logger)
 	consumerService, err := consumer.NewConsumerService(logger, cfg.FirstConsumer)
 	if err != nil {
 		logger.Error("error in create Consumer: ", slog.String("error", err.Error()))

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"kafka_with_go/internal/config"
-	"log"
 	"log/slog"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -23,8 +22,7 @@ func InitDB(logger *slog.Logger, db_info config.DataBase) error {
 		db_info.Port,
 		db_info.DBName,
 	)
-	log.Println("Connection string:", connectionString)
-
+	logger.Info("Connection string", slog.String("level", "info"))
 	dbPool, err = pgxpool.New(context.Background(), connectionString)
 	if err != nil {
 		logger.Error("Не удалось подключиться к базе данных", slog.String("error", err.Error()))

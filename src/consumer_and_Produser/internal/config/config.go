@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"time"
 
@@ -36,17 +36,17 @@ type HTTPServer struct {
 	IdleTimeout time.Duration `yaml:"idle_timeout" env-required:"true"`
 }
 
-func EnvLoad() *Config {
+func EnvLoad(logger *slog.Logger) *Config {
 	if err := godotenv.Load(".env"); err != nil {
-		log.Fatal("failed to load environment file, error: ", err)
+		logger.Error("failed to load environment file")
 	}
 
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
-		log.Fatal("CONFIG_PATH is not set")
+		logger.Warn("CONFIG_PATH is not set")
 	}
 
-	cfg := EnvLoadInPath(configPath)
+	cfg := EnvLoadInPath(configPath, logger)
 	return cfg
 }
 func EnvLoadDb() (*DataBase, error) {
@@ -61,27 +61,27 @@ func EnvLoadDb() (*DataBase, error) {
 	return &dbConfig, nil
 
 }
-func EnvLoadInPath(configPath string) *Config {
+func EnvLoadInPath(configPath string, logger *slog.Logger) *Config {
 
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		log.Fatal("config file not found: ", err)
+		logger.Warn("config file not found: ", slog.Any("error", err))
 	}
 
 	var cfg Config
 
 	if err := cleanenv.ReadConfig(configPath, &cfg.HTTPServer); err != nil { // Загружаем только HTTPServer
-		fmt.Printf("failed to read config, error: %+v\n", err) // Возвращаем ошибку, а не вызываем log.Fatal
+		logger.Warn("config file not found", slog.Any("error", err))
 	}
 	if err := cleanenv.ReadEnv(&cfg.FirstConsumer); err != nil {
-		log.Fatalf("failed to load consumer configuration from environment: %v\n", err)
+		logger.Error("failed to load consumer configuration from environment:", slog.Any("error", err))
 	}
 
 	var db *DataBase
 	db, err := EnvLoadDb()
 	if err != nil {
-		log.Fatal("err db %w\n", err)
+		logger.Error("err db", slog.Any("error", err))
 	}
 	cfg.DataBase = *db
-	log.Printf("DataBase configuration: %+v\n", cfg.DataBase)
+	logger.Error("DataBase configuration:", slog.Any("error", err))
 	return &cfg
 }
