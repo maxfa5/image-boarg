@@ -55,8 +55,8 @@
             <Array as="points" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="h2E8nRczxpqR-HWiFHpD-16" value="User DB" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
-          <mxGeometry x="630" y="145" width="70" height="30" as="geometry" />
+        <mxCell id="h2E8nRczxpqR-HWiFHpD-16" value="Users" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="640" y="145" width="50" height="30" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-37" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="h2E8nRczxpqR-HWiFHpD-17" target="h2E8nRczxpqR-HWiFHpD-34">
           <mxGeometry relative="1" as="geometry">
@@ -107,7 +107,7 @@
         <mxCell id="h2E8nRczxpqR-HWiFHpD-65" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="h2E8nRczxpqR-HWiFHpD-34" target="h2E8nRczxpqR-HWiFHpD-31">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="h2E8nRczxpqR-HWiFHpD-34" value="" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;" vertex="1" parent="1">
+        <mxCell id="h2E8nRczxpqR-HWiFHpD-34" value="kafka" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;" vertex="1" parent="1">
           <mxGeometry x="314" y="380" width="56" height="60" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-38" value="Posts" style="shape=datastore;whiteSpace=wrap;html=1;" vertex="1" parent="1">
@@ -119,16 +119,10 @@
         <mxCell id="h2E8nRczxpqR-HWiFHpD-46" value="sub" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
           <mxGeometry x="370" y="370" width="40" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="h2E8nRczxpqR-HWiFHpD-53" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="82.5" y="480.5" as="sourcePoint" />
-            <mxPoint x="40" y="510" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-57" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="h2E8nRczxpqR-HWiFHpD-48" target="h2E8nRczxpqR-HWiFHpD-51">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="h2E8nRczxpqR-HWiFHpD-48" value="" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;rotation=0;" vertex="1" parent="1">
+        <mxCell id="h2E8nRczxpqR-HWiFHpD-48" value="kafka" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;rotation=0;" vertex="1" parent="1">
           <mxGeometry x="640" y="555" width="72.5" height="60" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-51" value="notify service" style="rounded=0;whiteSpace=wrap;html=1;shape=hexagon;perimeter=hexagonPerimeter2;fixedSize=1;" vertex="1" parent="1">
@@ -145,6 +139,21 @@
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-61" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;entryX=0.84;entryY=0.123;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="h2E8nRczxpqR-HWiFHpD-3" target="h2E8nRczxpqR-HWiFHpD-17">
           <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="h2E8nRczxpqR-HWiFHpD-66" value="read" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="730" y="185" width="50" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="h2E8nRczxpqR-HWiFHpD-67" value="read" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="610" y="185" width="50" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="h2E8nRczxpqR-HWiFHpD-68" value="" style="shape=image;html=1;verticalLabelPosition=bottom;verticalAlign=top;imageAspect=1;aspect=fixed;image=img/clipart/Gear_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="318" y="420" width="52" height="61" as="geometry" />
+        </mxCell>
+        <mxCell id="h2E8nRczxpqR-HWiFHpD-69" value="" style="shape=image;html=1;verticalLabelPosition=bottom;verticalAlign=top;imageAspect=1;aspect=fixed;image=img/clipart/Gear_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="668" y="80" width="52" height="61" as="geometry" />
+        </mxCell>
+        <mxCell id="h2E8nRczxpqR-HWiFHpD-70" value="" style="shape=image;html=1;verticalLabelPosition=bottom;verticalAlign=top;imageAspect=1;aspect=fixed;image=img/clipart/Gear_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="600" y="494.5" width="52" height="61" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
