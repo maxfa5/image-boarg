@@ -43,7 +43,7 @@
           </mxGeometry>
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-11" value="User Service" style="rounded=0;whiteSpace=wrap;html=1;shape=hexagon;perimeter=hexagonPerimeter2;fixedSize=1;" vertex="1" parent="1">
-          <mxGeometry x="380" y="85" width="100" height="60" as="geometry" />
+          <mxGeometry x="420" y="65" width="100" height="60" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-12" value="Rest API" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
           <mxGeometry x="360" y="60" width="40" height="40" as="geometry" />
@@ -85,9 +85,6 @@
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-17" value="Post service" style="rounded=0;whiteSpace=wrap;html=1;shape=hexagon;perimeter=hexagonPerimeter2;fixedSize=1;" vertex="1" parent="1">
           <mxGeometry x="110" y="310" width="100" height="60" as="geometry" />
-        </mxCell>
-        <mxCell id="h2E8nRczxpqR-HWiFHpD-18" value="Rest API" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
-          <mxGeometry x="90" y="290" width="40" height="40" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-47" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="h2E8nRczxpqR-HWiFHpD-23" target="h2E8nRczxpqR-HWiFHpD-4">
           <mxGeometry relative="1" as="geometry" />
@@ -154,6 +151,9 @@
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-70" value="" style="shape=image;html=1;verticalLabelPosition=bottom;verticalAlign=top;imageAspect=1;aspect=fixed;image=img/clipart/Gear_128x128.png" vertex="1" parent="1">
           <mxGeometry x="600" y="494.5" width="52" height="61" as="geometry" />
+        </mxCell>
+        <mxCell id="h2E8nRczxpqR-HWiFHpD-71" value="&lt;font style=&quot;font-size: 13px;&quot;&gt;kafka&lt;/font&gt;" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;rotation=90;" vertex="1" parent="1">
+          <mxGeometry x="170" y="240" width="50" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
