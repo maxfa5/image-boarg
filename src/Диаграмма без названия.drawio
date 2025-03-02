@@ -170,8 +170,14 @@
         <mxCell id="h2E8nRczxpqR-HWiFHpD-85" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.25;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="h2E8nRczxpqR-HWiFHpD-17" target="h2E8nRczxpqR-HWiFHpD-72">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
+        <mxCell id="h2E8nRczxpqR-HWiFHpD-93" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="h2E8nRczxpqR-HWiFHpD-88" target="h2E8nRczxpqR-HWiFHpD-92">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-88" value="&lt;h4 style=&quot;font-weight: var(--ds-font-weight-strong); line-height: var(--ds-md-line-height); margin: calc(var(--ds-md-zoom)*16px)0 calc(var(--ds-md-zoom)*12px)0; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, &amp;quot;Segoe UI&amp;quot;, Roboto, &amp;quot;Noto Sans&amp;quot;, Ubuntu, Cantarell, &amp;quot;Helvetica Neue&amp;quot;, Oxygen, &amp;quot;Open Sans&amp;quot;, sans-serif;&quot;&gt;&lt;strong style=&quot;&quot;&gt;&lt;font style=&quot;color: rgb(0, 0, 0);&quot;&gt;Post Reader Service&lt;/font&gt;&lt;/strong&gt;&lt;/h4&gt;" style="rounded=0;whiteSpace=wrap;html=1;shape=hexagon;perimeter=hexagonPerimeter2;fixedSize=1;align=center;" vertex="1" parent="1">
           <mxGeometry x="60" y="400" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="h2E8nRczxpqR-HWiFHpD-92" value="Posts" style="shape=datastore;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="525" width="60" height="60" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
