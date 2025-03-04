@@ -86,7 +86,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-17" value="Post writer service" style="rounded=0;whiteSpace=wrap;html=1;shape=hexagon;perimeter=hexagonPerimeter2;fixedSize=1;" vertex="1" parent="1">
-          <mxGeometry x="145" y="290" width="100" height="60" as="geometry" />
+          <mxGeometry x="250" y="290" width="100" height="60" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-47" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="h2E8nRczxpqR-HWiFHpD-23" target="h2E8nRczxpqR-HWiFHpD-4">
           <mxGeometry relative="1" as="geometry" />
@@ -115,11 +115,8 @@
         <mxCell id="h2E8nRczxpqR-HWiFHpD-46" value="sub" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
           <mxGeometry x="370" y="370" width="40" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="h2E8nRczxpqR-HWiFHpD-106" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="h2E8nRczxpqR-HWiFHpD-48" target="h2E8nRczxpqR-HWiFHpD-105">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-48" value="kafka" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;rotation=90;" vertex="1" parent="1">
-          <mxGeometry x="166.25" y="403.75" width="60" height="60" as="geometry" />
+          <mxGeometry x="180" y="359" width="60" height="60" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-51" value="notify service" style="rounded=0;whiteSpace=wrap;html=1;shape=hexagon;perimeter=hexagonPerimeter2;fixedSize=1;" vertex="1" parent="1">
           <mxGeometry x="626.25" y="450" width="100" height="60" as="geometry" />
@@ -149,7 +146,7 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-72" value="kafka" style="strokeWidth=2;html=1;shape=mxgraph.flowchart.direct_data;whiteSpace=wrap;rotation=0;" vertex="1" parent="1">
-          <mxGeometry x="265" y="280" width="158" height="60" as="geometry" />
+          <mxGeometry x="380" y="280" width="55" height="60" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-100" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="h2E8nRczxpqR-HWiFHpD-81" target="h2E8nRczxpqR-HWiFHpD-51">
           <mxGeometry relative="1" as="geometry" />
@@ -164,10 +161,10 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-88" value="&lt;h4 style=&quot;font-weight: var(--ds-font-weight-strong); line-height: var(--ds-md-line-height); margin: calc(var(--ds-md-zoom)*16px)0 calc(var(--ds-md-zoom)*12px)0; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, &amp;quot;Segoe UI&amp;quot;, Roboto, &amp;quot;Noto Sans&amp;quot;, Ubuntu, Cantarell, &amp;quot;Helvetica Neue&amp;quot;, Oxygen, &amp;quot;Open Sans&amp;quot;, sans-serif;&quot;&gt;&lt;strong style=&quot;&quot;&gt;&lt;font style=&quot;color: rgb(0, 0, 0);&quot;&gt;Post Reader Service&lt;/font&gt;&lt;/strong&gt;&lt;/h4&gt;" style="rounded=0;whiteSpace=wrap;html=1;shape=hexagon;perimeter=hexagonPerimeter2;fixedSize=1;align=center;" vertex="1" parent="1">
-          <mxGeometry x="20" y="460" width="100" height="60" as="geometry" />
+          <mxGeometry x="25" y="330" width="100" height="60" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-92" value="Posts" style="shape=datastore;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="310" y="620" width="60" height="60" as="geometry" />
+          <mxGeometry x="106.25" y="540" width="60" height="60" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-95" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="h2E8nRczxpqR-HWiFHpD-88" target="h2E8nRczxpqR-HWiFHpD-94">
           <mxGeometry relative="1" as="geometry">
@@ -179,19 +176,22 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-94" value="elastickSearch" style="ellipse;shape=cloud;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="135" y="590" width="120" height="80" as="geometry" />
+          <mxGeometry x="15" y="431" width="120" height="80" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-98" value="Rest API" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
-          <mxGeometry x="135" y="260" width="40" height="40" as="geometry" />
+          <mxGeometry x="230" y="270" width="40" height="40" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-99" value="Rest API" style="whiteSpace=wrap;html=1;aspect=fixed;" vertex="1" parent="1">
-          <mxGeometry x="20" y="439" width="40" height="40" as="geometry" />
+          <mxGeometry x="20" y="300" width="40" height="40" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-107" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="h2E8nRczxpqR-HWiFHpD-105" target="h2E8nRczxpqR-HWiFHpD-92">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="h2E8nRczxpqR-HWiFHpD-105" value="&lt;h4 style=&quot;font-weight: var(--ds-font-weight-strong); line-height: var(--ds-md-line-height); margin: calc(var(--ds-md-zoom)*16px)0 calc(var(--ds-md-zoom)*12px)0; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, &amp;quot;Segoe UI&amp;quot;, Roboto, &amp;quot;Noto Sans&amp;quot;, Ubuntu, Cantarell, &amp;quot;Helvetica Neue&amp;quot;, Oxygen, &amp;quot;Open Sans&amp;quot;, sans-serif;&quot;&gt;&lt;strong style=&quot;&quot;&gt;&lt;font style=&quot;color: rgb(0, 0, 0);&quot;&gt;Post Reader Sinchonizer&lt;/font&gt;&lt;/strong&gt;&lt;/h4&gt;" style="rounded=0;whiteSpace=wrap;html=1;shape=hexagon;perimeter=hexagonPerimeter2;fixedSize=1;align=center;" vertex="1" parent="1">
-          <mxGeometry x="270" y="540" width="100" height="60" as="geometry" />
+          <mxGeometry x="190" y="540" width="100" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="h2E8nRczxpqR-HWiFHpD-109" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.245;entryY=-0.002;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="h2E8nRczxpqR-HWiFHpD-48" target="h2E8nRczxpqR-HWiFHpD-105">
+          <mxGeometry relative="1" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
