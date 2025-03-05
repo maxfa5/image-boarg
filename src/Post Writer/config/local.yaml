@@ -1,0 +1,14 @@
+# consumer_1:
+#   # env:  broker1:29092, broker2:29093, broker3:29094
+#   # BROKERS_ADDRESSES:  localhost:9092, localhost:9093, localhost:9094
+
+#   consumer_group: test_group
+#   message_topic: orders 
+
+
+# http_server:
+  host: localhost
+  protocol: http
+  port: 8000
+  timeout: 5s
+  idle_timeout: 60s

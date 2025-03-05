@@ -14,7 +14,7 @@ RUN go mod download
 
 COPY . .
 # Собираем приложение с включенным CGO
-RUN CGO_ENABLED=1 GOOS=linux go build -o sinchron  -ldflags="-s -w" ./cmd/consumer/main.go
+RUN CGO_ENABLED=1 GOOS=linux go build -o sinchron  -ldflags="-s -w" ./cmd/sinchron/main.go
 
 # Stage 2: Create the final image
 FROM debian:bullseye-slim
