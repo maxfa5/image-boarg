@@ -11,13 +11,12 @@ import (
 )
 
 type Config struct {
-	FirstConsumer Consumer
+	Producer
 	HTTPServer
 	DataBase
 }
-type Consumer struct {
+type Producer struct {
 	Brokers string `env:"BROKERS_ADDRESSES" env-required:"true"`
-	GroupId string `env:"CONSUMER_GROUP" env-required:"true"`
 	Topic   string `env:"MESSAGE_TOPIC" env-required:"true"`
 }
 type DataBase struct {
@@ -72,8 +71,8 @@ func EnvLoadInPath(configPath string, logger *slog.Logger) *Config {
 	if err := cleanenv.ReadConfig(configPath, &cfg.HTTPServer); err != nil { // Загружаем только HTTPServer
 		logger.Warn("config file not found", slog.Any("error", err))
 	}
-	if err := cleanenv.ReadEnv(&cfg.FirstConsumer); err != nil {
-		logger.Error("failed to load consumer configuration from environment:", slog.Any("error", err))
+	if err := cleanenv.ReadEnv(&cfg.Producer); err != nil {
+		logger.Error("failed to load Producer configuration from environment:", slog.Any("error", err))
 	}
 
 	var db *DataBase

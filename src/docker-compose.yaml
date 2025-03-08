@@ -32,10 +32,10 @@ services:
     networks:
       - elastic
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:5601 | grep -q 'Kibana'"] # Example healthcheck
+      test: ["CMD-SHELL", "curl -s http://localhost:5601/status | grep -q 'Kibana'"] # Example healthcheck
       interval: 5s
       timeout: 5s
-      retries: 3
+      retries: 4
 
 
   sinchron:
@@ -46,8 +46,7 @@ services:
     command: ./sinchron
     environment:
       BROKERS_ADDRESSES: broker1:29092,broker2:29093,broker3:29094
-      DB_USERNAME: myuser
-      DB_PASSWORD: mypassword
+      MESSAGE_TOPIC: messages
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: mydatabase
