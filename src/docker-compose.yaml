@@ -37,7 +37,33 @@ services:
       timeout: 5s
       retries: 4
 
+  writer:
+    image: writer:latest
+    # build:
+    #   context: consumer_and_Produser 
+    #   dockerfile:  Dockerfile.consumer
+    command: ./writer
+    environment:
+      BROKERS_ADDRESSES: broker1:29092,broker2:29093,broker3:29094
+      MESSAGE_TOPIC: messages
+      PORT: 8083
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: mydatabase
+      DB_SSLMODE: disable
 
+    networks:
+      - network
+      - elastic
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kibana:
+        condition: service_healthy
+
+    working_dir: /app
   sinchron:
     image: sinchron:latest
     # build:
