@@ -5,6 +5,7 @@ import (
 	curd "kafka_with_go/internal/CURD"
 	"kafka_with_go/internal/config"
 	"log/slog"
+	"os"
 	"time"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
@@ -56,9 +57,12 @@ func connToKafkaTopic(cfg config.Consumer) (*kafka.Consumer, error) {
 	}
 
 	err = consumer.SubscribeTopics([]string{cfg.Topic}, nil)
+	fmt.Printf("AAAAAAAAAAAAAAAAAAAAAAAAAA: %v", cfg.Topic)
+
 	if err != nil {
 		consumer.Close()
 		fmt.Printf("error subscribing to topic: %v", err)
+
 	}
 	return consumer, nil
 }
@@ -83,6 +87,8 @@ func (c *ConsumerService) LoopGetMsg() {
 				}
 				err = fmt.Errorf("error while reading from kafka: %w", err)
 				c.logger.Error("Error while reading from kafka", slog.String("error", err.Error()))
+				fmt.Printf("error while reading from kafka: %v", err)
+				os.Exit(1)
 			}
 			go curd.HandleKafkaMessage(c.logger, msg)
 			c.logger.Info("Message received", slog.String("topic", *msg.TopicPartition.Topic),

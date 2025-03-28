@@ -24,6 +24,7 @@ func main() {
 	consumerService, err := consumer.NewConsumerService(logger, cfg.FirstConsumer)
 	if err != nil {
 		logger.Error("error in create Consumer: ", slog.String("error", err.Error()))
+
 		os.Exit(1)
 	}
 	err = Elconnect.InitElastic(logger)
