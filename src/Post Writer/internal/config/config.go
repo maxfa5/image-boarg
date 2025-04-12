@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/joho/godotenv"
@@ -28,11 +27,11 @@ type DataBase struct {
 	SSLMode  string `env:"DB_SSLMODE" env-default:"require"`
 }
 type HTTPServer struct {
-	Host        string        `yaml:"host" env-required:"true"`
-	Port        int           `yaml:"port" env-required:"true"`
-	Protocol    string        `yaml:"protocol" env-required:"true"`
-	Timeout     time.Duration `yaml:"timeout" env-required:"true"`
-	IdleTimeout time.Duration `yaml:"idle_timeout" env-required:"true"`
+	Host string `env:"host"`
+	Port int    `env:"PORT" env-required:"true"`
+	// Protocol    string        `yaml:"protocol" env-required:"true"`
+	// Timeout     time.Duration `yaml:"timeout" env-required:"true"`
+	// IdleTimeout time.Duration `yaml:"idle_timeout" env-required:"true"`
 }
 
 func EnvLoad(logger *slog.Logger) *Config {
@@ -68,7 +67,7 @@ func EnvLoadInPath(configPath string, logger *slog.Logger) *Config {
 
 	var cfg Config
 
-	if err := cleanenv.ReadConfig(configPath, &cfg.HTTPServer); err != nil { // Загружаем только HTTPServer
+	if err := cleanenv.ReadEnv(&cfg.HTTPServer); err != nil { // Загружаем только HTTPServer
 		logger.Warn("config file not found", slog.Any("error", err))
 	}
 	if err := cleanenv.ReadEnv(&cfg.Producer); err != nil {
@@ -81,6 +80,6 @@ func EnvLoadInPath(configPath string, logger *slog.Logger) *Config {
 		logger.Error("err db", slog.Any("error", err))
 	}
 	cfg.DataBase = *db
-	logger.Error("DataBase configuration:", slog.Any("error", err))
+	// logger.Error("DataBase configuration:", slog.Any("error", err))
 	return &cfg
 }

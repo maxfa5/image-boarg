@@ -11,6 +11,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -41,12 +42,13 @@ func main() {
 	}).Methods("POST")
 
 	// Запуск сервера
-	fmt.Println("Сервер запущен на порту 8083...")
-	log.Fatal(http.ListenAndServe(":8083", r))
+	fmt.Println("Сервер запущен на порту " + strconv.Itoa(cfg.HTTPServer.Port))
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(cfg.HTTPServer.Port), r))
 }
 
 func pushMessage(w http.ResponseWriter, r *http.Request, producerService *producer.ProducerService, logger *slog.Logger) {
 	var message curd.CRUDMessage
+	fmt.Print(r.Body)
 	jsonMsg := json.NewDecoder(r.Body)
 	if err := jsonMsg.Decode(&message); err != nil {
 		http.Error(w, "Некорректный JSON", http.StatusBadRequest)
@@ -54,13 +56,14 @@ func pushMessage(w http.ResponseWriter, r *http.Request, producerService *produc
 	}
 	// log.Printf("%s\n", message.Model)
 	curd.HandleMessageInDB(logger, &message)
-
-	if err := producerService.SendMessageInKafka(logger, "messages", message); err != nil {
-		logger.Error("Ошибка отправки сообщения в Kafka", slog.String("error", err.Error()))
-		http.Error(w, "Ошибка отправки сообщения в Kafka", http.StatusInternalServerError)
-		return
-	}
-
+	go func() {
+		err := producerService.SendMessageInKafka(logger, "messages", message)
+		if err != nil {
+			logger.Error("Ошибка отправки сообщения в Kafka", slog.String("error", err.Error()))
+			// http.Error(w, "Ошибка отправки сообщения в Kafka", http.StatusInternalServerError)
+			return
+		}
+	}()
 	// Успешный ответ
 	w.WriteHeader(http.StatusCreated)
 	w.Write([]byte("Операция выполнена успешно"))

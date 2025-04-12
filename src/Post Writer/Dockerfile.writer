@@ -20,8 +20,8 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get update && apt-get install -y iputils-ping
 
 
-COPY . .
 WORKDIR /app
+COPY . .
 COPY --from=builder /app/writer .
 
 CMD ["./writer"]

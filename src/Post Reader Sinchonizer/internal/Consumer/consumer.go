@@ -24,7 +24,7 @@ func NewConsumerService(logger *slog.Logger, cfg config.Consumer) (*ConsumerServ
 	if err != nil {
 		logger.Error("Ошибка подключения к Kafka", slog.String("error", err.Error()))
 	} else {
-		logger.Info("Consumer успешно подключен к Kafka. Ожидание сообщений...")
+		logger.Info("Consumer успешно подключен к Kafka" + cfg.Topic + ". Ожидание сообщений...")
 	}
 
 	return &ConsumerService{
@@ -62,9 +62,8 @@ func connToKafkaTopic(cfg config.Consumer) (*kafka.Consumer, error) {
 	if err != nil {
 		consumer.Close()
 		fmt.Printf("error subscribing to topic: %v", err)
-
 	}
-	return consumer, nil
+	return consumer, err
 }
 
 func (c *ConsumerService) LoopGetMsg() {

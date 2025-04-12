@@ -45,15 +45,16 @@ services:
       context: Post Writer
       dockerfile:  Dockerfile.writer  
     command: ./writer
+    ports:
+      - "8001:8001"
     environment:
       BROKERS_ADDRESSES: broker1:29092,broker2:29093,broker3:29094
       MESSAGE_TOPIC: messages
-      PORT: 8083
+      PORT: 8001
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: mydatabase
       DB_SSLMODE: disable
-
     networks:
       - network
       - elastic
@@ -219,7 +220,7 @@ services:
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
     ports:
-      - "9020:8080"  # Порт для доступа к Kafka UI
+      - "9020:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: postgres_connect_01
       KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: "broker1:29092,broker2:29093,broker3:29094"
@@ -230,12 +231,11 @@ services:
     networks:
       - network
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:9020/actuator/health"] #лучше использовать curl, но его нужно устанавливать в образ
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8080 || exit 1"]
       interval: 10s
-      timeout: 3s
-      retries: 2
-
-
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 networks:
   network:
     driver: bridge
