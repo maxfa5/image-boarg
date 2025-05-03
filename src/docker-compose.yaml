@@ -1,30 +1,115 @@
-networks:
-  consumer_and_produser_network:
-    external: true
 services:
-  consumer:
-    image: consumer:latest
-    # build:
-    #   context: consumer_and_Produser 
-    #   dockerfile:  Dockerfile.consumer
-    command: ./consumer
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.17.3 # Укажите желаемую версию
+    container_name: elasticsearch  # Необязательно, но полезно для удобства
+    environment:
+      - discovery.type=single-node  # Для разработки (один узел)
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g  # Выделите память (настройте в соответствии с вашими потребностями)
+      - xpack.security.enabled=false  # Отключаем Security Features
+      - network.host=0.0.0.0
+    ports:
+      - "9200:9200"  # HTTP API
+      - "9300:9300"  # Транспортный протокол (между узлами)
+    volumes:
+      - esdata:/usr/share/elasticsearch/data  # Хранилище данных (важно!)
+    networks:
+      - elastic  # Присоединитесь к сети elastic
+    depends_on:
+      - kafka-ui
+    healthcheck:
+      test: curl -s http://localhost:9200 || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.17.3
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_USERNAME: ""
+      ELASTICSEARCH_PASSWORD: ""
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - elastic
+    healthcheck:
+      test: ["CMD-SHELL", "curl  http://localhost:5601/api/status"]
+      interval: 5s
+      timeout: 5s
+      retries: 4
+
+  writer:
+    image: writer:latest
+    build:
+      context: Post Writer
+      dockerfile:  Dockerfile.writer  
+    command: ./writer
+    ports:
+      - "8001:8001"
     environment:
       BROKERS_ADDRESSES: broker1:29092,broker2:29093,broker3:29094
-      DB_USERNAME: myuser
-      DB_PASSWORD: mypassword
+      MESSAGE_TOPIC: messages
+      PORT: 8001
       DB_HOST: postgres
       DB_PORT: 5432
       DB_NAME: mydatabase
       DB_SSLMODE: disable
-
     networks:
-      - consumer_and_produser_network
+      - network
+      - elastic
     volumes:
       - ./logs:/app/logs
     depends_on:
       postgres:
         condition: service_healthy
+      kibana:
+        condition: service_healthy
+
     working_dir: /app
+  sinchron:
+    image: sinchron:latest
+    build:
+      context: Post Reader Sinchonizer/
+      dockerfile:  Dockerfile.sinchron  
+    command: ./sinchron
+    environment:
+      BROKERS_ADDRESSES: broker1:29092,broker2:29093,broker3:29094
+      MESSAGE_TOPIC: messages
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: mydatabase
+      DB_SSLMODE: disable
+    networks:
+      - network
+      - elastic
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kibana:
+        condition: service_healthy
+
+    working_dir: /app
+
+  post_reader:
+    image:  post_reader:latest
+    # build:
+    #   context: consumer_and_Produser 
+    #   dockerfile:  Dockerfile.consumer
+    command: ./reader
+    ports:
+      - "8085:8085"
+    environment:
+      Host_elastic: elasticsearch
+    networks:
+      - elastic
+    volumes:
+      - ./logs:/app/logs
+    depends_on:
+      - sinchron
+
   postgres:
     image: postgres:latest
     container_name: postgres_container
@@ -40,12 +125,126 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./consumer&Produser/config/init.sql:/docker-entrypoint-initdb.d/init.sql 
     networks:
-      - consumer_and_produser_network
+      - network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
       interval: 7s
       timeout: 3s
       retries: 5
+    depends_on:
+      - broker1
+      - broker2
+      - broker3
+
+
+
+#opt/kafka/bin/kafka-topics.sh --create --topic orders --bootstrap-server localhost:29092 --replication-factor 2 --partitions 3
+
+  broker1:
+    image: apache/kafka:latest
+    hostname: broker1
+    container_name: broker1
+    ports:
+      - 9092:9092  # Map PLAINTEXT_HOST to the host
+      - 29094:29094
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29092,CONTROLLER://broker1:29094,PLAINTEXT_HOST://0.0.0.0:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker1:29092,PLAINTEXT_HOST://localhost:9092,CONTROLLER://broker1:29094
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker1:29094,2@broker2:29096,3@broker3:29095
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      KAFKA_KRAFT_CLUSTER_ID: "${CLUSTER_ID:-$(uuidgen)}"
+    networks:
+      - network
+    volumes:
+      - kafka_data1:/kafka/data
+    # entrypoint: ["./create-topics.sh"]
+
+
+  broker2:
+    image: apache/kafka:latest
+    hostname: broker2
+    container_name: broker2
+    ports:
+      - 9093:9093  # Map PLAINTEXT_HOST to the host
+      - 29096:29096
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29093,CONTROLLER://broker2:29096,PLAINTEXT_HOST://0.0.0.0:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker2:29093,PLAINTEXT_HOST://localhost:9093,CONTROLLER://broker2:29096
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 2
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker1:29094,2@broker2:29096,3@broker3:29095
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      KAFKA_KRAFT_CLUSTER_ID: "${CLUSTER_ID:-$(uuidgen)}"
+    networks:
+      - network
+    volumes:
+      - kafka_data2:/kafka/data
+
+  broker3:
+    image: apache/kafka:latest
+    hostname: broker3
+    container_name: broker3
+    ports:
+      - 9094:9094  # Map PLAINTEXT_HOST to the host
+      - 29095:29095
+    environment:
+      KAFKA_BROKER_ID: 3
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:29094,CONTROLLER://broker3:29095,PLAINTEXT_HOST://0.0.0.0:9094
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker3:29094,PLAINTEXT_HOST://localhost:9094,CONTROLLER://broker3:29095
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_NODE_ID: 3
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@broker1:29094,2@broker2:29096,3@broker3:29095
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
+      KAFKA_KRAFT_CLUSTER_ID: "${CLUSTER_ID:-$(uuidgen)}"
+    networks:
+      - network
+    volumes:
+      - kafka_data3:/kafka/data
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    ports:
+      - "9020:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: postgres_connect_01
+      KAFKA_CLUSTERS_0_BOOTSTRAP_SERVERS: "broker1:29092,broker2:29093,broker3:29094"
+    depends_on:
+      - broker1
+      - broker2
+      - broker3
+    networks:
+      - network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8080 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+networks:
+  network:
+    driver: bridge
+  elastic:  # Определите сеть elastic
+    driver: bridge
 
 volumes:
   postgres_data:
+  esdata:
+  kafka_data1:
+  kafka_data2:
+  kafka_data3:
