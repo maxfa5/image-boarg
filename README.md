@@ -1,4 +1,4 @@
 # image-boarg
 
 ## Arcitecture
-![arcitecture of project](diagram.png)
+![arcitecture of project](diagramm.png)
