@@ -85,6 +85,7 @@ func GetMessagesByChatID(w http.ResponseWriter, r *http.Request, client *elastic
 	searchResult, err := client.Search().
 		Index("messages"). // Укажите имя вашего индекса
 		Query(query).
+		Size(100).
 		Do(ctx)
 	if err != nil {
 		http.Error(w, "Ошибка при поиске сообщений", http.StatusInternalServerError)
