@@ -15,4 +15,5 @@ public class ProtectedController {
 
         return ResponseEntity.ok("Secret data");
     }
+
 }
