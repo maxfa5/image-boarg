@@ -15,11 +15,11 @@ import (
 )
 
 type MessageData struct {
-	Post_id string  `json: "post_id"`
-	Author  string  `json: "author_id"`
+	Post_id string  `json:"post_id"`
+	Author  string  `json:"author_id"`
 	Content string  `json:"content"`
 	ChatID  float64 `json:"chat_id"`
-	images  []Image `json: "images"`
+	Images  []Image `json:"images"`
 }
 
 type Image struct {
@@ -110,15 +110,19 @@ func GetMessagesByChatID(w http.ResponseWriter, r *http.Request, client *elastic
 	var messages []MessageData
 	for _, hit := range searchResult.Hits.Hits {
 		var msg MessageData
-		err := json.Unmarshal(hit.Source, &msg)
-		if err != nil {
-			http.Error(w, "Ошибка при декодировании сообщения", http.StatusInternalServerError)
-			return
-		}
-		messages = append(messages, msg)
-	}
 
-	// Отправка результата в формате JSON
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(messages)
+		// Используем _source, так как fields может иметь другую структуру
+		if hit.Source != nil {
+			err := json.Unmarshal(hit.Source, &msg)
+			if err != nil {
+				http.Error(w, "Ошибка при декодировании сообщения", http.StatusInternalServerError)
+				return
+			}
+			messages = append(messages, msg)
+		}
+
+		// Отправка результата в формате JSON
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(messages)
+	}
 }
