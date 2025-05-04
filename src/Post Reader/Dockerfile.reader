@@ -16,13 +16,12 @@ COPY . .
 RUN CGO_ENABLED=1 GOOS=linux go build -o reader  -ldflags="-s -w" ./cmd/reader/main.go
 
 # Stage 2: Create the final image
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 # Устанавливаем только необходимые зависимости для запуска
 RUN apt-get update && apt-get install -y \
+     iputils-ping\
     && rm -rf /var/lib/apt/lists/*
-    
-RUN apt-get update && apt-get install -y iputils-ping
 
 WORKDIR /app
 
@@ -30,6 +29,5 @@ COPY --from=builder /app/reader .
 COPY . .
 
 RUN ls -l
-
 
 CMD ["./reader"]

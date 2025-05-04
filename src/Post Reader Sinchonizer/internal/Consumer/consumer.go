@@ -89,7 +89,7 @@ func (c *ConsumerService) LoopGetMsg() {
 				fmt.Printf("error while reading from kafka: %v", err)
 				os.Exit(1)
 			}
-			go curd.HandleKafkaMessage(c.logger, msg)
+			curd.HandleKafkaMessage(c.logger, msg)
 			c.logger.Info("Message received", slog.String("topic", *msg.TopicPartition.Topic),
 				slog.Int("partition", int(msg.TopicPartition.Partition)),
 				slog.Any("offset", msg.TopicPartition.Offset),

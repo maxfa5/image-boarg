@@ -15,8 +15,19 @@ import (
 )
 
 type MessageData struct {
+	Post_id string  `json: "post_id"`
+	Author  string  `json: "author_id"`
 	Content string  `json:"content"`
 	ChatID  float64 `json:"chat_id"`
+	images  []Image `json: "images"`
+}
+
+type Image struct {
+	URL  string `json:"url"`  // keyword
+	Hash string `json:"hash"` // keyword
+}
+
+type Images struct {
 }
 
 var client *elastic.Client
@@ -67,21 +78,24 @@ func GetAllMessages(w http.ResponseWriter, r *http.Request, client *elastic.Clie
 	json.NewEncoder(w).Encode(messages)
 }
 
-// getMessagesByChatID возвращает сообщения по chat_id
 func GetMessagesByChatID(w http.ResponseWriter, r *http.Request, client *elastic.Client) {
 	ctx := context.Background()
 	vars := mux.Vars(r)
-	chatIDStr := vars["chat_id"]
+	threadIDStr := vars["thread_id"] // Получаем thread_id из параметров маршрута
 
-	// Преобразование chat_id в число
-	chatID, err := strconv.ParseFloat(chatIDStr, 64)
+	fmt.Printf("vars: %v\n", vars)
+
+	// Преобразование thread_id в целое число
+	threadID, err := strconv.ParseInt(threadIDStr, 10, 64) // 10 - base, 64 - bitSize
 	if err != nil {
-		http.Error(w, "Некорректный chat_id", http.StatusBadRequest)
+		http.Error(w, fmt.Sprintf("Некорректный thread_id: %s. Ожидается целое число.", threadIDStr), http.StatusBadRequest)
 		return
 	}
 
-	// Поиск сообщений по chat_id
-	query := elastic.NewTermQuery("chat_id", chatID)
+	fmt.Printf("threadID: %d\n", threadID)
+
+	// Поиск сообщений по thread_id
+	query := elastic.NewTermQuery("thread_id", threadID)
 	searchResult, err := client.Search().
 		Index("messages"). // Укажите имя вашего индекса
 		Query(query).

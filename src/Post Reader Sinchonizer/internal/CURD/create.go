@@ -8,6 +8,7 @@ import (
 	Elconnect "kafka_with_go/internal/Elasticconnect"
 	"log"
 	"log/slog"
+	"strings"
 	"time"
 
 	"github.com/elastic/go-elasticsearch/v8"
@@ -22,8 +23,17 @@ type CRUDMessage struct {
 }
 
 type MessageData struct {
-	Content string  `json:"content"`
-	ChatID  float64 `json:"chat_id"`
+	PostID    string    `json:"post_id"`   // keyword
+	ThreadID  string    `json:"thread_id"` // keyword
+	AuthorID  string    `json:"author_id"` // keyword (ссылка на PostgreSQL users.id/user.name)
+	Content   string    `json:"content"`   // text
+	Images    []Image   `json:"images"`    // nested
+	Timestamp time.Time `json:"timestamp"` // date
+}
+
+type Image struct {
+	URL  string `json:"url"`  // keyword
+	Hash string `json:"hash"` // keyword
 }
 
 func HandleKafkaMessage(logger *slog.Logger, msg *kafka.Message) {
@@ -67,47 +77,138 @@ func handleMessageModel(logger *slog.Logger, crudMessage CRUDMessage) {
 	}
 }
 
-func createMessage(logger *slog.Logger, data MessageData, db *elasticsearch.Client) {
+// func createMessage(logger *slog.Logger, data MessageData, db *elasticsearch.Client) {
+// 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+// 	defer cancel()
+
+// 	// Преобразуйте структуру MessageData в JSON
+// 	jsonData, err := json.Marshal(data)
+// 	if err != nil {
+// 		logger.Error("Failed to marshal message data to JSON", slog.String("error", err.Error()))
+// 		return
+// 	}
+// 	// Определите индекс, в который вы хотите сохранить документ
+// 	indexName := "messages"
+
+// 	// Индексируйте документ в Elasticsearch
+// 	resp, err := db.Index(
+// 		indexName,
+// 		bytes.NewReader(jsonData),
+// 		db.Index.WithContext(ctx),
+// 		db.Index.WithRefresh("true"), //  "true" - для немедленного обновления индекса (для целей отладки)
+// 	)
+// 	if err != nil {
+// 		logger.Error("Failed to index document in Elasticsearch", slog.String("error", err.Error()))
+// 		return
+// 	}
+// 	defer resp.Body.Close()
+
+// 	if resp.IsError() {
+// 		logger.Error("Elasticsearch returned an error", slog.String("status", resp.String()))
+// 		return
+// 	}
+
+// 	fmt.Println("Successfully indexed message in Elasticsearch")
+
+// 	// ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+// 	// defer cancel()
+// 	// // Prepare the statement outside the function (e.g., during application startup)
+// 	// insertMessageSQL := "INSERT INTO messages (content, chat_id) VALUES ($1, $2)"
+// 	// //
+// 	// if _, err := db.Exec(ctx, insertMessageSQL, data.Content, int(data.ChatID)); err != nil {
+// 	// 	logger.Error("Failed to create message", slog.String("error", err.Error()))
+// 	// 	return
+// 	// }
+// 	// fmt.Println("SuccessFully send")
+// }
+
+func createMessage(logger *slog.Logger, data MessageData, client *elasticsearch.Client) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	// Преобразуйте структуру MessageData в JSON
+	// Устанавливаем timestamp если не задан
+	if data.Timestamp.IsZero() {
+		data.Timestamp = time.Now()
+	}
+
 	jsonData, err := json.Marshal(data)
 	if err != nil {
-		logger.Error("Failed to marshal message data to JSON", slog.String("error", err.Error()))
+		logger.Error("Failed to marshal message data",
+			slog.String("error", err.Error()))
 		return
 	}
-	// Определите индекс, в который вы хотите сохранить документ
-	indexName := "messages"
 
-	// Индексируйте документ в Elasticsearch
-	resp, err := db.Index(
-		indexName,
+	resp, err := client.Index(
+		"messages",
 		bytes.NewReader(jsonData),
-		db.Index.WithContext(ctx),
-		db.Index.WithRefresh("true"), //  "true" - для немедленного обновления индекса (для целей отладки)
+		client.Index.WithContext(ctx),
+		client.Index.WithRefresh("true"),
+		client.Index.WithDocumentID(data.PostID), // Используем post_id как ID документа
 	)
 	if err != nil {
-		logger.Error("Failed to index document in Elasticsearch", slog.String("error", err.Error()))
+		logger.Error("Failed to index message",
+			slog.String("error", err.Error()))
 		return
 	}
 	defer resp.Body.Close()
 
 	if resp.IsError() {
-		logger.Error("Elasticsearch returned an error", slog.String("status", resp.String()))
+		logger.Error("Elasticsearch error",
+			slog.String("status", resp.String()))
 		return
 	}
 
-	fmt.Println("Successfully indexed message in Elasticsearch")
+	logger.Info("Message indexed successfully",
+		slog.String("post_id", data.PostID),
+		slog.String("thread_id", data.ThreadID))
+}
 
-	// ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	// defer cancel()
-	// // Prepare the statement outside the function (e.g., during application startup)
-	// insertMessageSQL := "INSERT INTO messages (content, chat_id) VALUES ($1, $2)"
-	// //
-	// if _, err := db.Exec(ctx, insertMessageSQL, data.Content, int(data.ChatID)); err != nil {
-	// 	logger.Error("Failed to create message", slog.String("error", err.Error()))
-	// 	return
-	// }
-	// fmt.Println("SuccessFully send")
+func CreateMessagesIndex(client *elasticsearch.Client) error {
+	mapping := `{
+        "mappings": {
+            "properties": {
+                "post_id":    { "type": "keyword" },
+                "thread_id":  { "type": "keyword" },
+                "author_id":  { "type": "keyword" },
+                "content":    { 
+                    "type": "text",
+                    "analyzer": "russian" 
+                },
+                "images": {
+                    "type": "nested",
+                    "properties": {
+                        "url":  { "type": "keyword" },
+                        "hash": { "type": "keyword" }
+                    }
+                },
+                "timestamp": { "type": "date" }
+            }
+        },
+        "settings": {
+            "analysis": {
+                "analyzer": {
+                    "russian": {
+                        "type": "custom",
+                        "tokenizer": "standard",
+                        "filter": ["lowercase", "russian_morphology"]
+                    }
+                }
+            }
+        }
+    }`
+
+	resp, err := client.Indices.Create(
+		"messages",
+		client.Indices.Create.WithBody(strings.NewReader(mapping)),
+	)
+	if err != nil {
+		return fmt.Errorf("error creating index: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.IsError() {
+		return fmt.Errorf("error response: %s", resp.String())
+	}
+
+	return nil
 }
