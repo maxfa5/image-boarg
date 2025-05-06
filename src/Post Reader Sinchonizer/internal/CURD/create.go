@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/elastic/go-elasticsearch/v8"
+	"github.com/google/uuid"
 
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
@@ -23,14 +24,20 @@ type CRUDMessage struct {
 }
 
 type MessageData struct {
-	PostID    string    `json:"post_id"`   // keyword
-	ThreadID  string    `json:"thread_id"` // keyword
-	AuthorID  string    `json:"author_id"` // keyword (ссылка на PostgreSQL users.id/user.name)
-	Content   string    `json:"content"`   // text
-	Images    []Image   `json:"images"`    // nested
-	Timestamp time.Time `json:"timestamp"` // date
+	PostID       string    `json:"post_id"`        // keyword
+	ThreadID     string    `json:"thread_id"`      // keyword
+	AuthorID     string    `json:"author_id"`      // keyword (ссылка на PostgreSQL users.id/user.name)
+	Content      string    `json:"content"`        // text
+	Images       []Image   `json:"images"`         // nested
+	Timestamp    time.Time `json:"timestamp"`      // date
+	IsThreadRoot bool      `json:"is_thread_root"` // boolean (true если сообщение начало треда)
 }
-
+type ThreadDocument struct {
+	ThreadID   string    `json:"thread_id"`
+	RootPostID string    `json:"root_post_id"`
+	IsClosed   bool      `json:"is_closed"`
+	CreatedAt  time.Time `json:"created_at"`
+}
 type Image struct {
 	URL  string `json:"url"`  // keyword
 	Hash string `json:"hash"` // keyword
@@ -77,51 +84,6 @@ func handleMessageModel(logger *slog.Logger, crudMessage CRUDMessage) {
 	}
 }
 
-// func createMessage(logger *slog.Logger, data MessageData, db *elasticsearch.Client) {
-// 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-// 	defer cancel()
-
-// 	// Преобразуйте структуру MessageData в JSON
-// 	jsonData, err := json.Marshal(data)
-// 	if err != nil {
-// 		logger.Error("Failed to marshal message data to JSON", slog.String("error", err.Error()))
-// 		return
-// 	}
-// 	// Определите индекс, в который вы хотите сохранить документ
-// 	indexName := "messages"
-
-// 	// Индексируйте документ в Elasticsearch
-// 	resp, err := db.Index(
-// 		indexName,
-// 		bytes.NewReader(jsonData),
-// 		db.Index.WithContext(ctx),
-// 		db.Index.WithRefresh("true"), //  "true" - для немедленного обновления индекса (для целей отладки)
-// 	)
-// 	if err != nil {
-// 		logger.Error("Failed to index document in Elasticsearch", slog.String("error", err.Error()))
-// 		return
-// 	}
-// 	defer resp.Body.Close()
-
-// 	if resp.IsError() {
-// 		logger.Error("Elasticsearch returned an error", slog.String("status", resp.String()))
-// 		return
-// 	}
-
-// 	fmt.Println("Successfully indexed message in Elasticsearch")
-
-// 	// ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-// 	// defer cancel()
-// 	// // Prepare the statement outside the function (e.g., during application startup)
-// 	// insertMessageSQL := "INSERT INTO messages (content, chat_id) VALUES ($1, $2)"
-// 	// //
-// 	// if _, err := db.Exec(ctx, insertMessageSQL, data.Content, int(data.ChatID)); err != nil {
-// 	// 	logger.Error("Failed to create message", slog.String("error", err.Error()))
-// 	// 	return
-// 	// }
-// 	// fmt.Println("SuccessFully send")
-// }
-
 func createMessage(logger *slog.Logger, data MessageData, client *elasticsearch.Client) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -130,7 +92,17 @@ func createMessage(logger *slog.Logger, data MessageData, client *elasticsearch.
 	if data.Timestamp.IsZero() {
 		data.Timestamp = time.Now()
 	}
+	fmt.Println(data.Timestamp)
 
+	if data.IsThreadRoot {
+		var err error
+		data.ThreadID, err = createNewThread(logger, data.PostID, client)
+		if err != nil {
+			logger.Error("Failed to index message",
+				slog.String("error", err.Error()))
+			return
+		}
+	}
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		logger.Error("Failed to marshal message data",
@@ -161,6 +133,48 @@ func createMessage(logger *slog.Logger, data MessageData, client *elasticsearch.
 	logger.Info("Message indexed successfully",
 		slog.String("post_id", data.PostID),
 		slog.String("thread_id", data.ThreadID))
+}
+
+func createNewThread(logger *slog.Logger, postID string, client *elasticsearch.Client) (string, error) {
+	threadID := uuid.New().String()
+
+	// Создаем документ треда
+	thread := ThreadDocument{
+		ThreadID:   threadID,
+		RootPostID: postID,
+		IsClosed:   false,
+		CreatedAt:  time.Now(),
+	}
+
+	// Преобразуем структуру в JSON
+	doc, err := json.Marshal(thread)
+	if err != nil {
+		return "", fmt.Errorf("json marshal error: %w", err)
+	}
+
+	// Индексируем документ
+	resp, err := client.Index(
+		"threads",
+		bytes.NewReader(doc),
+		client.Index.WithDocumentID(threadID),
+		client.Index.WithRefresh("wait_for"),
+	)
+	if err != nil {
+		return "", fmt.Errorf("elasticsearch error: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.IsError() {
+		logger.Error("Elasticsearch error",
+			slog.String("status", resp.String()))
+		return "", fmt.Errorf("Elasticsearch error")
+	}
+
+	logger.Info("New thread created",
+		slog.String("thread_id", threadID),
+		slog.String("root_post_id", postID))
+
+	return threadID, nil
 }
 
 func CreateMessagesIndex(client *elasticsearch.Client) error {

@@ -37,7 +37,11 @@ func main() {
 		elastic.GetMessagesByChatID(w, r, client)
 	}
 
+	getThreads := func(w http.ResponseWriter, r *http.Request) {
+		elastic.GetThreads(w, r, client)
+	}
 	r.HandleFunc("/messages", getAllMessagesHandler).Methods("GET")
+	r.HandleFunc("/api/threads", getThreads).Methods("GET")
 	r.HandleFunc("/messages/{thread_id}", getMessagesByChatIDHandler).Methods("GET")
 	// Запуск сервера
 	fmt.Printf("Сервер запущен на порту %s...\n", cfg.ServerElastic.Port_server)
