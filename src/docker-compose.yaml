@@ -1,4 +1,18 @@
 services:
+  api-gateway:
+    image: api-gateway
+    build:
+      context: API Gateway
+      dockerfile:  Dockerfile  
+    ports:
+      - "80:80"
+    depends_on:
+      - writer
+      - post_reader
+    networks:
+      - elastic
+      - auth_net
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.17.3 # Укажите желаемую версию
     container_name: elasticsearch  # Необязательно, но полезно для удобства
@@ -242,7 +256,9 @@ networks:
     driver: bridge
   elastic:  # Определите сеть elastic
     driver: bridge
-
+  auth_net:
+    name: auth_net  # То же самое имя!
+    external: true 
 volumes:
   postgres_data:
   esdata:

@@ -11,7 +11,7 @@ services:
       db:
         condition: service_healthy
     networks:
-      - network
+      - auth_net
   
   auth:
     build: ./Auth_for_image_board
@@ -25,7 +25,7 @@ services:
       db:
         condition: service_healthy
     networks:
-      - network  
+      - auth_net  
       
   db:
     image: postgres:latest
@@ -44,10 +44,11 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - network
+      - auth_net
 volumes:
   postgres_data:
 
 networks:
-  network:
+  auth_net:
+    name: auth_net
     driver: bridge
