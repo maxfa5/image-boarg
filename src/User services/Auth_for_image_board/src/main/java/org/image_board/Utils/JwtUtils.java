@@ -40,7 +40,7 @@ public class JwtUtils {
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-            System.out.println(claims.getExpiration());
+//            System.out.println(claims.getExpiration());
             // Проверка срока действия
             if (claims.getExpiration().before(new Date())) {
                 throw new ExpiredJwtException(null, claims, "Token expired");

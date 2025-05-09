@@ -12,7 +12,7 @@ public class ProtectedController {
     @GetMapping("/data")
     public ResponseEntity<String> getProtectedData() {
         // Только для аутентифицированных пользователей
-
+        System.out.println("AAAAAA +");
         return ResponseEntity.ok("Secret data");
     }
 

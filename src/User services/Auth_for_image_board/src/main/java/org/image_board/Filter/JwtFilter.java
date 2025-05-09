@@ -24,6 +24,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             String token = extractToken(request);
 
+            System.out.println(request.getHeader("Authorization") + request.getRequestURI());
             if (token != null && validateToken(token)) {
                 String username = JwtUtils.extractUsername(token);
                 UsernamePasswordAuthenticationToken authentication =
@@ -32,12 +33,17 @@ public class JwtFilter extends OncePerRequestFilter {
                         );
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-
             filterChain.doFilter(request, response);
 
         } catch (ExpiredJwtException ex) {
+            ex.printStackTrace();
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expired");
         } catch (JwtException ex) {
+            ex.printStackTrace();
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
         }
     }

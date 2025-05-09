@@ -59,7 +59,7 @@ func InitElastic(cfg config.Config) (*elastic.Client, error) {
 // getAllMessages возвращает все сообщения из Elasticsearch
 func GetAllMessages(w http.ResponseWriter, r *http.Request, client *elastic.Client) {
 	ctx := context.Background()
-
+	fmt.Println("aaaa" + r.Method)
 	// Поиск всех сообщений
 	searchResult, err := client.Search().
 		Index("messages"). // Укажите имя вашего индекса
