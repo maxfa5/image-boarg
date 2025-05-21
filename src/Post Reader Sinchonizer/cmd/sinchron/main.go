@@ -13,12 +13,6 @@ import (
 )
 
 func main() {
-	// file, err := os.Create("loger.txt")
-	// if err != nil {
-	// 	fmt.Println("error in logger")
-	// }
-
-	// defer file.Close()
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	cfg := config.EnvLoad(logger)
 	consumerService, err := consumer.NewConsumerService(logger, cfg.FirstConsumer)
@@ -31,10 +25,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Ошибка инициализации базы данных: %v", err)
 	}
-	// err = database.InitDB(logger, cfg.DataBase)
-	// if err != nil {
-	// 	log.Fatalf("Ошибка инициализации базы данных: %v", err)
-	// }
+
 	go consumerService.LoopGetMsg()
 
 	cancelCh := make(chan os.Signal, 1)

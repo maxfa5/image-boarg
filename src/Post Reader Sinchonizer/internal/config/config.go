@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"time"
 
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/joho/godotenv"
@@ -27,13 +26,6 @@ type DataBase struct {
 	Port     string `env:"DB_PORT" env-default:"5430"`
 	DBName   string `env:"DB_NAME" env-default:"mydatabase"`
 	SSLMode  string `env:"DB_SSLMODE" env-default:"require"`
-}
-type HTTPServer struct {
-	Host        string        `yaml:"host" env-required:"true"`
-	Port        int           `yaml:"port" env-required:"true"`
-	Protocol    string        `yaml:"protocol" env-required:"true"`
-	Timeout     time.Duration `yaml:"timeout" env-required:"true"`
-	IdleTimeout time.Duration `yaml:"idle_timeout" env-required:"true"`
 }
 
 func EnvLoad(logger *slog.Logger) *Config {

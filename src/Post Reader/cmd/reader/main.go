@@ -13,12 +13,7 @@ import (
 )
 
 func main() {
-	// file, err := os.Create("loger.txt")
-	// if err != nil {
-	// 	fmt.Println("error in logger")
-	// }
 
-	// defer file.Close()
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 	cfg := config.EnvLoad(logger)
 	// Инициализация Elasticsearch клиента
