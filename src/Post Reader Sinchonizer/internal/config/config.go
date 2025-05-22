@@ -11,7 +11,7 @@ import (
 
 type Config struct {
 	FirstConsumer Consumer
-	HTTPServer
+	// HTTPServer
 	DataBase
 }
 type Consumer struct {
@@ -61,9 +61,9 @@ func EnvLoadInPath(configPath string, logger *slog.Logger) *Config {
 
 	var cfg Config
 
-	if err := cleanenv.ReadConfig(configPath, &cfg.HTTPServer); err != nil { // Загружаем только HTTPServer
-		logger.Warn("config file not found", slog.Any("error", err))
-	}
+	// if err := cleanenv.ReadConfig(configPath, &cfg.HTTPServer); err != nil { // Загружаем только HTTPServer
+	// 	logger.Warn("config file not found", slog.Any("error", err))
+	// }
 	if err := cleanenv.ReadEnv(&cfg.FirstConsumer); err != nil {
 		logger.Error("failed to load consumer configuration from environment:", slog.Any("error", err))
 	}

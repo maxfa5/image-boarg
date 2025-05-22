@@ -110,6 +110,12 @@ func createMessage(logger *slog.Logger, data MessageData, client *elasticsearch.
 		return
 	}
 
+	// Создаем индекс, если он не существует
+	if err := CreateIndexIfNotExists(client, "messages"); err != nil {
+		logger.Error("Elasticsearch error in create index")
+		return
+	}
+
 	resp, err := client.Index(
 		"messages",
 		bytes.NewReader(jsonData),
@@ -177,51 +183,94 @@ func createNewThread(logger *slog.Logger, postID string, client *elasticsearch.C
 	return threadID, nil
 }
 
-func CreateMessagesIndex(client *elasticsearch.Client) error {
-	mapping := `{
-        "mappings": {
-            "properties": {
-                "post_id":    { "type": "keyword" },
-                "thread_id":  { "type": "keyword" },
-                "author_id":  { "type": "keyword" },
-                "content":    { 
-                    "type": "text",
-                    "analyzer": "russian" 
-                },
-                "images": {
-                    "type": "nested",
-                    "properties": {
-                        "url":  { "type": "keyword" },
-                        "hash": { "type": "keyword" }
-                    }
-                },
-                "timestamp": { "type": "date" }
-            }
-        },
-        "settings": {
-            "analysis": {
-                "analyzer": {
-                    "russian": {
-                        "type": "custom",
-                        "tokenizer": "standard",
-                        "filter": ["lowercase", "russian_morphology"]
-                    }
-                }
-            }
-        }
-    }`
-
-	resp, err := client.Indices.Create(
-		"messages",
-		client.Indices.Create.WithBody(strings.NewReader(mapping)),
-	)
+func CreateIndexIfNotExists(client *elasticsearch.Client, indexName string) error {
+	// Проверяем, существует ли индекс
+	res, err := client.Indices.Exists([]string{indexName})
 	if err != nil {
-		return fmt.Errorf("error creating index: %w", err)
+		return fmt.Errorf("failed to check if index exists: %v", err)
 	}
-	defer resp.Body.Close()
+	defer res.Body.Close()
 
-	if resp.IsError() {
-		return fmt.Errorf("error response: %s", resp.String())
+	if res.StatusCode == 404 {
+		// Индекс не существует, создаем его
+		mapping := `{
+		"mappings": {
+			"properties": {
+				"author_id": {
+					"type": "keyword"
+				},
+				"chat_id": {
+					"type": "long"
+				},
+				"content": {
+					"type": "text",
+					"fields": {
+						"keyword": {
+							"type": "keyword",
+							"ignore_above": 256
+						}
+					}
+				},
+				"images": {
+					"type": "nested",
+					"properties": {
+						"hash": {
+							"type": "text",
+							"fields": {
+								"keyword": {
+									"type": "keyword",
+									"ignore_above": 256
+								}
+							}
+						},
+						"url": {
+							"type": "text",
+							"fields": {
+								"keyword": {
+									"type": "keyword",
+									"ignore_above": 256
+								}
+							}
+						}
+					}
+				},
+				"is_thread_root": {
+					"type": "boolean"
+				},
+				"post_id": {
+					"type": "text",
+					"fields": {
+						"keyword": {
+							"type": "keyword",
+							"ignore_above": 256
+						}
+					}
+				},
+				"thread_id": {
+					"type": "keyword"
+				},
+				"timestamp": {
+					"type": "date"
+				}
+			}
+		}
+	}`
+		// Создаем индекс с указанным маппингом
+		createIndexResponse, err := client.Indices.Create(
+			"messages",
+			client.Indices.Create.WithBody(strings.NewReader(mapping)),
+		)
+		if err != nil {
+			return fmt.Errorf("failed to create index: %w", err)
+		}
+		defer createIndexResponse.Body.Close()
+
+		if createIndexResponse.IsError() {
+			return fmt.Errorf("error creating index: %s", createIndexResponse.String())
+		}
+		log.Printf("Index %s created successfully", indexName)
+	} else {
+		log.Printf("Index %s already exists", indexName)
 	}
 
 	return nil
