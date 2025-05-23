@@ -144,8 +144,8 @@ services:
       - network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
-      interval: 7s
-      timeout: 3s
+      interval: 5s
+      timeout: 7s
       retries: 5
     depends_on:
       - broker1

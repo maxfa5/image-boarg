@@ -1,5 +1,5 @@
 services:
-  registration_service:
+  registration-service:
     build: ./User_for_image-board_Service
     ports:
       - "8001:8001"

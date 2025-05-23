@@ -92,6 +92,11 @@ func createMessage(logger *slog.Logger, data MessageData, client *elasticsearch.
 	if data.Timestamp.IsZero() {
 		data.Timestamp = time.Now()
 	}
+
+	if data.PostID == "" {
+		newUUID := uuid.New()
+		data.PostID = newUUID.String()
+	}
 	fmt.Println(data.Timestamp)
 
 	if data.IsThreadRoot {
