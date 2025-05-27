@@ -1,18 +1,36 @@
 <template>
   <div>
-    <div v-if="error" class="error">{{ error }}</div>
-    <div v-else-if="loading">Загрузка тредов...</div>
-    <div v-else>
-      <div v-for="thread in threads" :key="thread.thread_id" class="thread-link">
-        <router-link :to="'/thread/' + thread.thread_id" @click.native="fetchThreadMessages(thread.thread_id)">
-          Тред #{{ thread.thread_id.slice(0, 8) }}...
-          <span v-if="thread.is_closed" class="closed-badge">(закрыт)</span>
-          <span class="created-at">{{ formatDate(thread.created_at) }}</span>
-        </router-link>
-      </div>
+    <div v-for="thread in threads" :key="thread.thread_id" class="thread-item">
+      <router-link 
+        :to="{
+          path: '/thread/' + thread.thread_id,
+          query: { 
+            title: thread.title,
+            // Можно передать другие параметры, если нужно
+            is_closed: thread.is_closed 
+          }
+        }"
+        class="thread-link"
+      >
+        <span class="thread-title">{{ thread.title }}</span>
+        <span v-if="thread.is_closed" class="closed-badge">(закрыт)</span>
+        <span class="thread-date">{{ formatDate(thread.created_at) }}</span>
+      </router-link>
     </div>
   </div>
 </template>
+
+<style scoped>
+.thread-title {
+  text-decoration: none;
+  color: #2c3e50;
+  font-weight: 500;
+}
+.thread-title:hover {
+  color: #42b983;
+  text-decoration: underline;
+}
+</style>
 
 <script>
 export default {
@@ -48,7 +66,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-/* Стили остаются такими же */
-</style>

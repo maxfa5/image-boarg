@@ -3,7 +3,7 @@
     <div v-if="error" class="error">{{ error }}</div>
     <div v-else-if="loadingMessages">Загрузка сообщений...</div>
     <div v-else>
-      <h2>Сообщения треда #{{ threadId.slice(0, 8) }}...</h2>
+      <h2>Сообщения треда {{ title.slice(0, 20) }}...</h2>
       <div v-for="message in messages" :key="message.id" class="message">
         <div class="message-content">{{ message.content }}</div>
         <div class="message-meta">
@@ -19,6 +19,7 @@ export default {
   data() {
     return {
       messages: [],
+      title: '',
       threadId: '',
       error: null,
       loadingMessages: true
@@ -26,6 +27,7 @@ export default {
   },
   created() {
     this.threadId = this.$route.params.id;
+    this.title = this.$route.query.title || 'Без названия'; // Получаем title из query параметров
     this.fetchMessages();
   },
   methods: {

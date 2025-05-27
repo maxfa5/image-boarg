@@ -4,7 +4,7 @@ import ThreadView from './components/ThreadView.vue'
 
 const routes = [
   { path: '/', component: ThreadList },
-  { path: '/thread/:id', component: ThreadView, props: true }
+  { path: '/thread/:id',  component: ThreadView, props: route => ({ title: route.query.title }) }
 ]
 
 const router = createRouter({
