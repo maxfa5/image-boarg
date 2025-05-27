@@ -25,6 +25,7 @@ type MessageData struct {
 }
 type ThreadData struct {
 	ThreadID   string    `json:"thread_id"`
+	Title      string    `json:"title"`
 	RootPostID string    `json:"root_post_id"`
 	IsClosed   bool      `json:"is_closed"`
 	CreatedAt  time.Time `json:"created_at"`

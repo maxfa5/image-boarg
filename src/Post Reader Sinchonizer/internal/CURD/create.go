@@ -34,6 +34,7 @@ type MessageData struct {
 }
 type ThreadDocument struct {
 	ThreadID   string    `json:"thread_id"`
+	Title      string    `json:"title"`
 	RootPostID string    `json:"root_post_id"`
 	IsClosed   bool      `json:"is_closed"`
 	CreatedAt  time.Time `json:"created_at"`
@@ -90,7 +91,7 @@ func createMessage(logger *slog.Logger, data MessageData, client *elasticsearch.
 
 	// Устанавливаем timestamp если не задан
 	if data.Timestamp.IsZero() {
-		data.Timestamp = time.Now()
+		data.Timestamp = time.Now().UTC()
 	}
 
 	if data.PostID == "" {
@@ -101,12 +102,13 @@ func createMessage(logger *slog.Logger, data MessageData, client *elasticsearch.
 
 	if data.IsThreadRoot {
 		var err error
-		data.ThreadID, err = createNewThread(logger, data.PostID, client)
+		data.ThreadID, err = createNewThread(logger, data.PostID, data.Content, client)
 		if err != nil {
 			logger.Error("Failed to index message",
 				slog.String("error", err.Error()))
 			return
 		}
+
 	}
 	jsonData, err := json.Marshal(data)
 	if err != nil {
@@ -146,13 +148,14 @@ func createMessage(logger *slog.Logger, data MessageData, client *elasticsearch.
 		slog.String("thread_id", data.ThreadID))
 }
 
-func createNewThread(logger *slog.Logger, postID string, client *elasticsearch.Client) (string, error) {
+func createNewThread(logger *slog.Logger, postID string, threadTitle string, client *elasticsearch.Client) (string, error) {
 	threadID := uuid.New().String()
 
 	// Создаем документ треда
 	thread := ThreadDocument{
 		ThreadID:   threadID,
 		RootPostID: postID,
+		Title:      threadTitle,
 		IsClosed:   false,
 		CreatedAt:  time.Now(),
 	}
