@@ -4,7 +4,7 @@
     <form @submit.prevent="submitForm" class="message-form">
       
       <div class="form-group">
-        <label for="messageContent" class="form-label">Сообщение</label>
+        <!-- <label for="messageContent" class="form-label">Сообщение</label> -->
         <textarea
           id="messageContent"
           v-model="formData.content"
@@ -15,8 +15,7 @@
         ></textarea>
       </div>
 
-      <div class="form-group">
-        <label class="form-label">Изображения (максимум 3)</label>
+      <div class="form-group-2">
         <div class="image-upload-container">
           <input
             type="file"
@@ -32,8 +31,7 @@
             @click="$refs.fileInput.click()"
             class="upload-button"
             :disabled="uploadedImages.length >= 3"
-          >
-            <i class="upload-icon">📁</i> Добавить изображения
+          > Добавить изображения
           </button>
           <div v-if="uploadedImages.length > 0" class="image-preview-container">
             <div v-for="(image, index) in uploadedImages" :key="index" class="image-preview">
@@ -44,22 +42,15 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="form-actions">
+        <div class="form-actions">
         <button type="submit" class="submit-btn" :disabled="isSubmitting">
           <span v-if="isSubmitting">Отправка...</span>
-          <span v-else>{{ isNewThread ? 'Создать тред' : 'Отправить' }}</span>
-        </button>
-        <button
-          v-if="!isNewThread"
-          type="button"
-          @click="cancelReply"
-          class="cancel-btn"
-        >
-          Отмена
+          <span v-else>{{ isNewThread ? 'Создать тред' : 'Добавить' }}</span>
         </button>
       </div>
+      </div>
+
+      
     </form>
   </div>
 </template>
@@ -186,18 +177,20 @@ export default {
 
 <style scoped>
 .message-form-container {
-  background-color: #fff;
-  border-radius: 8px;
+  background-color: #E3e3ee;
+  border-radius: 15px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
   margin-bottom: 20px;
 }
 
 .form-title {
-  margin-top: 0;
-  margin-bottom: 20px;
+  margin: 0 auto;
+  margin-bottom: 10px;
   color: #2c3e50;
   font-size: 1.25rem;
+  text-align: center;
+  font-size: 35px;
 }
 
 .message-form {
@@ -211,7 +204,12 @@ export default {
   flex-direction: column;
   gap: 8px;
 }
-
+.form-group-2 {
+  display: flex;
+  flex-direction: row;
+  align-items:center ;
+  justify-content: space-between;
+}
 .form-label {
   font-weight: 500;
   color: #4a5568;
@@ -220,8 +218,9 @@ export default {
 .form-input,
 .form-textarea {
   padding: 10px 12px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  background-color: #E3e3ee;
+  border: 1px solid #8C8B8B;
+  border-radius: 15px;
   font-size: 1rem;
   transition: border-color 0.2s;
 }
@@ -246,9 +245,10 @@ export default {
 
 .upload-button {
   padding: 10px 15px;
-  background-color: #f7fafc;
-  border: 1px dashed #cbd5e0;
-  border-radius: 6px;
+  background-color: #E3e3ee;
+  color: #8C8B8B;
+  border: 1px dashed #8C8B8B;
+  border-radius: 15px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -281,7 +281,7 @@ export default {
   position: relative;
   width: 100px;
   height: 100px;
-  border-radius: 4px;
+  border-radius: 15px;
   overflow: hidden;
 }
 
@@ -320,10 +320,12 @@ export default {
 
 .submit-btn {
   padding: 10px 20px;
-  background-color: #4299e1;
-  color: white;
-  border: none;
-  border-radius: 6px;
+  background-color: #E3e3ee;
+  color: #733671;
+  border: #8C8B8B;
+  border-style:  solid;
+  border-radius: 15px;
+  border-width: 1px;
   font-weight: 500;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -343,7 +345,7 @@ export default {
   background-color: #f7fafc;
   color: #4a5568;
   border: 1px solid #e2e8f0;
-  border-radius: 6px;
+  border-radius: 15px;
   cursor: pointer;
   transition: all 0.2s;
 }

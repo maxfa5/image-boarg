@@ -3,7 +3,7 @@
     <div v-if="error" class="error">{{ error }}</div>
     <div v-else-if="loadingMessages">Загрузка сообщений...</div>
     <div v-else>
-      <h2>Сообщения треда {{ title.slice(0, 20) }}{{ title.length > 20 ? '...' : '' }}</h2>
+      <h2 class="thread_msg">Сообщения треда </h2>
       <div v-for="message in messages" :key="message.post_id" class="message">
         <div class="message-author" v-if="message.author_id">
           Автор: {{ message.author_id }}
@@ -94,11 +94,15 @@ export default {
 .message-author {
   font-weight: bold;
   margin-bottom: 8px;
-  color: #2c3e50;
+  color: #8B5E88;
 }
 .message-content {
   margin-bottom: 10px;
   white-space: pre-line;
+}
+.thread_msg{
+  font-size: 30px;
+  text-align: center;
 }
 .message-meta {
   font-size: 0.8em;

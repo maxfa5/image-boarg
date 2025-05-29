@@ -1,7 +1,6 @@
 <template>
-  <div class="threads-container">
-        <div class="header-section">
-      <h1 class="page-title">Список тредов</h1>
+  <div class="header-section">
+      <div class="loginAndRegister">
       <button 
         v-if="!isAuthenticated"
         @click="goToLogin"
@@ -20,7 +19,10 @@
         <i class="icon-login"></i> Регистрация
       </button>
     </div>
-
+    </div>
+  <div class="threads-container">
+    
+    <h1 class="page-title">Треды</h1>
     <div v-if="error" class="error-message">{{ error }}</div>
     <div v-else-if="loading" class="loading-indicator">
       <div class="spinner"></div>
@@ -62,7 +64,9 @@
     @message-created="handleNewMessage"
     @cancel="closeReplyForm"
   />
-  </div>
+    <News></News>
+</div>
+  <div class="footer"></div>
 </template>
 
 <script>
@@ -70,9 +74,12 @@ import { isAuthenticated } from '../utils/cookies';
 import { deleteCookie } from '../utils/cookies';
 
 import MessageForm from './MessageForm.vue';
+import News from './News.vue';
+
 export default {
   components: {
-    MessageForm
+    MessageForm,
+    News
   },
   data() {
     return {
@@ -123,12 +130,28 @@ export default {
 </script>
 <style scoped>
 .threads-container {
-  max-width: 800px;
+  max-width: 1000px;
   margin: 0 auto;
   padding: 20px;
 }
-
+html, body{
+  height: 100%;
+  margin: 0; 
+  box-sizing: border-box;
+}
+.footer{
+  background-image: url('@/assets/footer.png'); /* Укажите путь к изображению */
+  background-size: cover; /* Масштабирование изображения для заполнения контейнера */
+  background-position: center; /* Центрирование изображения */
+  height: 250px; /* Установите высоту для футера */
+  width: 100%; /* Занимаем всю ширину */
+}
 .header-section {
+  background-image: url("@/assets/header.png");
+  background-size: cover; /* Масштабирование изображения для заполнения контейнера */
+  background-position: center; /* Центрирование изображения */
+  height: 331px; /* Установите высоту для футера */
+  width: 100%; /* Занимаем всю ширину */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -136,7 +159,8 @@ export default {
 }
 
 .page-title {
-  font-size: 24px;
+  text-align: center;
+  font-size: 30px;
   color: #333;
 }
 
@@ -149,6 +173,7 @@ export default {
   font-size: 14px;
   cursor: pointer;
   display: flex;
+  margin-left: 10px;
   align-items: center;
   gap: 5px;
   transition: background-color 0.3s;
@@ -161,6 +186,13 @@ export default {
 .create-thread-section {
   margin-top: 30px;
   text-align: center;
+}
+.loginAndRegister{
+  margin: 10px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .create-button {
@@ -182,15 +214,22 @@ export default {
 }
 
 .threads-list {
-  display: grid;
-  gap: 15px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 20px;
 }
 
 .thread-item {
+  align-items: center;
+  background-color: #D9D9D9;
+  width: 140px;
+  margin: 20px;
   border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 15px;
   overflow: hidden;
   transition: box-shadow 0.3s;
+  
 }
 
 .thread-item:hover {
@@ -201,6 +240,7 @@ export default {
   display: block;
   text-decoration: none;
   color: inherit;
+  text-align: center;
   padding: 15px;
 }
 
@@ -213,6 +253,12 @@ export default {
   font-size: 18px;
   font-weight: 500;
   margin-bottom: 8px;
+   display: -webkit-box;
+  -webkit-line-clamp: 2; /* Количество строк */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .thread-meta {
