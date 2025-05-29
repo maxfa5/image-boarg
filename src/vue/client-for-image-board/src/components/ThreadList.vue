@@ -9,9 +9,16 @@
       >
         <i class="icon-login"></i> Войти
       </button>
+            
       <div v-if="isAuthenticated">
         <button @click="logout" class="logout-button">Выйти</button>
       </div>
+      <button 
+        @click="goToRegister"
+        class="login-button"
+      >
+        <i class="icon-login"></i> Регистрация
+      </button>
     </div>
 
     <div v-if="error" class="error-message">{{ error }}</div>
@@ -105,6 +112,8 @@ export default {
       });
     }, goToLogin() {
       this.$router.push('/login');
+    }, goToRegister() {
+      this.$router.push('/registration');
     }, logout() {
       this.isAuthenticated = false; // Обновите состояние аутентификации'
       deleteCookie('user_data');
