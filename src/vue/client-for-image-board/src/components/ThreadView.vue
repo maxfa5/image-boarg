@@ -46,7 +46,7 @@ export default {
   methods: {
     async fetchMessages() {
       try {
-        const response = await fetch(`http://localhost/api/messages/${this.threadId}`);
+        const response = await fetch(`/api/messages/${this.threadId}`);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         this.messages = await response.json();
       } catch (err) {

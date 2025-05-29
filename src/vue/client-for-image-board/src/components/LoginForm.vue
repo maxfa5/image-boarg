@@ -42,7 +42,7 @@
 
 <script>
 import axios from 'axios';
-import { setCookie } from '@/utils/cookies';
+import { setCookie } from '../utils/cookies.js';
 
 export default {
   name: 'LoginForm',
@@ -63,7 +63,7 @@ export default {
       
       try {
         const response = await axios.post(
-          'http://localhost/api/auth/login', 
+          '/api/auth/login', 
           {
             username: this.credentials.username,
             password: this.credentials.password
@@ -76,11 +76,11 @@ export default {
         );
         
         // Сохраняем данные в куки
-        setCookie('auth_token', response.data.token, 7); // на 7 дней
-        setCookie('user_data', JSON.stringify(response.data.user), 7);
+        setCookie('auth_token', response.data.token, 10); 
+        setCookie('user_data', (response.data.username), 10);
         
         // Перенаправляем пользователя
-        this.$router.push('/dashboard');
+        this.$router.push('/');
         
       } catch (err) {
         console.error('Ошибка авторизации:', err);

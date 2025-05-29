@@ -40,7 +40,8 @@ export const getAuthToken = () => {
 
 // Проверка авторизации
 export const isAuthenticated = () => {
-  return !!getAuthToken();
+  console.log(getCookie('user_data'));
+  return getCookie('user_data')!=null
 };
 
 // Выход из системы

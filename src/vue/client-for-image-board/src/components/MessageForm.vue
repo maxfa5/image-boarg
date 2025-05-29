@@ -2,18 +2,7 @@
   <div class="message-form-container">
     <h3 class="form-title">{{ isNewThread ? 'Новый тред' : 'Ответить' }}</h3>
     <form @submit.prevent="submitForm" class="message-form">
-      <div v-if="isNewThread" class="form-group">
-        <label for="threadTitle" class="form-label">Заголовок треда</label>
-        <input
-          id="threadTitle"
-          v-model="formData.threadTitle"
-          type="text"
-          class="form-input"
-          placeholder="Введите заголовок"
-          required
-        >
-      </div>
-
+      
       <div class="form-group">
         <label for="messageContent" class="form-label">Сообщение</label>
         <textarea
@@ -76,8 +65,8 @@
 </template>
 
 <script>
-import UserStore from '../utils/UserStore.js'
-  let username = UserStore.getUsername();
+import {getCookie} from '../utils/cookies.js'
+import {isAuthenticated} from '../utils/cookies.js'
 
 export default {
   props: {
@@ -126,12 +115,19 @@ export default {
       this.uploadedImages.splice(index, 1)
     },
     async submitForm() {
+      console.log(isAuthenticated())
+      if(isAuthenticated()==false){
+        alert("Пользователь не аутентифицирован!")
+        return;
+      }
   this.isSubmitting = true;
   this.error = null;
 
   try {
-    const token = "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhMyIsImlhdCI6MTc0ODUxMzYxNiwiZXhwIjoxNzQ4NjAwMDE2fQ.Biyo3FyZOkiHe7aZdrW4nhNEx6QfjBwU3lORwTqvMyW96WCAT5jIviW00cOGMCJB"
+    const token = getCookie("auth_token");
     // Подготовка данных в новом формате
+    let username = getCookie("user_data");
+    console.log(username);
     const requestData = {
       action: "create",
       model: "messages",
@@ -147,11 +143,6 @@ export default {
         is_thread_root: this.isNewThread
       }
     };
-
-    // Добавляем заголовок, если это новый тред
-    if (this.isNewThread) {
-      requestData.data.title = this.formData.threadTitle;
-    }
 
     const endpoint = '/api/push';
 

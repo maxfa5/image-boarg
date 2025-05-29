@@ -1,11 +1,27 @@
 <template>
   <div class="threads-container">
+        <div class="header-section">
+      <h1 class="page-title">Список тредов</h1>
+      <button 
+        v-if="!isAuthenticated"
+        @click="goToLogin"
+        class="login-button"
+      >
+        <i class="icon-login"></i> Войти
+      </button>
+      <div v-if="isAuthenticated">
+        <button @click="logout" class="logout-button">Выйти</button>
+      </div>
+    </div>
+
     <div v-if="error" class="error-message">{{ error }}</div>
     <div v-else-if="loading" class="loading-indicator">
       <div class="spinner"></div>
       <span>Загрузка тредов...</span>
     </div>
+    
     <div v-else class="threads-list">
+
       <div v-for="thread in threads" :key="thread.thread_id" class="thread-item">
         <router-link 
           :to="{
@@ -33,22 +49,40 @@
         </router-link>
       </div>
     </div>
+    <MessageForm 
+    :thread-id=threadId
+    :isNewThread=true 
+    @message-created="handleNewMessage"
+    @cancel="closeReplyForm"
+  />
   </div>
 </template>
 
 <script>
+import { isAuthenticated } from '../utils/cookies';
+import { deleteCookie } from '../utils/cookies';
+
+import MessageForm from './MessageForm.vue';
 export default {
+  components: {
+    MessageForm
+  },
   data() {
     return {
       threads: [],
       error: null,
-      loading: true
+      loading: true,
+      isAuthenticated: false
     };
   },
   async created() {
+    this.checkAuthStatus();
     await this.fetchThreads();
   },
   methods: {
+    checkAuthStatus() {
+      this.isAuthenticated = isAuthenticated();
+    },
     async fetchThreads() {
       try {
         const response = await fetch('/api/threads');
@@ -69,11 +103,15 @@ export default {
         hour: '2-digit',
         minute: '2-digit'
       });
+    }, goToLogin() {
+      this.$router.push('/login');
+    }, logout() {
+      this.isAuthenticated = false; // Обновите состояние аутентификации'
+      deleteCookie('user_data');
     }
   }
 };
 </script>
-
 <style scoped>
 .threads-container {
   max-width: 800px;
@@ -81,120 +119,152 @@ export default {
   padding: 20px;
 }
 
-.error-message {
-  padding: 15px;
-  background-color: #ffebee;
-  color: #c62828;
-  border-radius: 4px;
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
-  border-left: 4px solid #c62828;
 }
 
-.loading-indicator {
+.page-title {
+  font-size: 24px;
+  color: #333;
+}
+
+.login-button {
+  background-color: #4a76a8;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  padding: 20px;
-  color: #666;
+  gap: 5px;
+  transition: background-color 0.3s;
 }
 
-.spinner {
-  width: 20px;
-  height: 20px;
-  border: 3px solid rgba(0, 0, 0, 0.1);
-  border-radius: 50%;
-  border-top-color: #42b983;
-  animation: spin 1s ease-in-out infinite;
+.login-button:hover {
+  background-color: #3a6598;
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.create-thread-section {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.create-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s;
+}
+
+.create-button:hover {
+  background-color: #218838;
 }
 
 .threads-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  gap: 15px;
 }
 
 .thread-item {
-  transition: transform 0.2s;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: box-shadow 0.3s;
 }
 
 .thread-item:hover {
-  transform: translateX(5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .thread-link {
   display: block;
   text-decoration: none;
   color: inherit;
-  padding: 16px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: all 0.2s;
-}
-
-.thread-link:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  background-color: #f8f9fa;
+  padding: 15px;
 }
 
 .thread-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
 }
 
 .thread-title {
-  font-size: 1.1rem;
+  font-size: 18px;
   font-weight: 500;
-  color: #2c3e50;
+  margin-bottom: 8px;
 }
 
 .thread-meta {
   display: flex;
   gap: 15px;
-  font-size: 0.85rem;
-  color: #7f8c8d;
+  font-size: 14px;
+  color: #666;
+}
+.logout-button {
+  background-color: #f44336; /* Красный цвет для кнопки выхода */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
 }
 
-.thread-date {
+.logout-button:hover {
+  background-color: #d32f2f; /* Темнее при наведении */
+}
+.thread-date, .closed-badge {
   display: flex;
   align-items: center;
   gap: 4px;
 }
 
 .closed-badge {
+  color: #dc3545;
+}
+
+.icon-clock, .icon-lock, .icon-login, .icon-plus {
+  font-size: 14px;
+}
+
+.loading-indicator {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 4px;
-  color: #e53935;
-  font-weight: 500;
+  gap: 10px;
+  padding: 30px;
 }
 
-.icon-clock::before {
-  content: "🕒";
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left-color: #4a76a8;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
 }
 
-.icon-lock::before {
-  content: "🔒";
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-@media (max-width: 600px) {
-  .threads-container {
-    padding: 10px;
-  }
-  
-  .thread-link {
-    padding: 12px;
-  }
-  
-  .thread-meta {
-    flex-direction: column;
-    gap: 5px;
-  }
+.error-message {
+  background-color: #fee2e2;
+  color: #ef4444;
+  padding: 15px;
+  border-radius: 4px;
+  text-align: center;
+  margin: 20px 0;
 }
 </style>
