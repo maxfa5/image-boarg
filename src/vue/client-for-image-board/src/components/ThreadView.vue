@@ -3,19 +3,32 @@
     <div v-if="error" class="error">{{ error }}</div>
     <div v-else-if="loadingMessages">Загрузка сообщений...</div>
     <div v-else>
-      <h2>Сообщения треда {{ title.slice(0, 20) }}...</h2>
-      <div v-for="message in messages" :key="message.id" class="message">
+      <h2>Сообщения треда {{ title.slice(0, 20) }}{{ title.length > 20 ? '...' : '' }}</h2>
+      <div v-for="message in messages" :key="message.post_id" class="message">
+        <div class="message-author" v-if="message.author_id">
+          Автор: {{ message.author_id }}
+        </div>
         <div class="message-content">{{ message.content }}</div>
         <div class="message-meta">
-          <span class="message-date">{{ formatDate(message.created_at) }}</span>
+          <span class="message-date">{{ formatDate(message.timestamp) }}</span>
         </div>
       </div>
     </div>
+    <MessageForm 
+    :thread-id=threadId 
+    @message-created="handleNewMessage"
+    @cancel="closeReplyForm"
+  />
   </div>
 </template>
 
+
 <script>
+import MessageForm from './MessageForm.vue';
 export default {
+  components: {
+    MessageForm
+  },
   data() {
     return {
       messages: [],
@@ -27,7 +40,7 @@ export default {
   },
   created() {
     this.threadId = this.$route.params.id;
-    this.title = this.$route.query.title || 'Без названия'; // Получаем title из query параметров
+    this.title = this.$route.query.title || 'Без названия';
     this.fetchMessages();
   },
   methods: {
@@ -44,24 +57,53 @@ export default {
       }
     },
     formatDate(isoString) {
-      return new Date(isoString).toLocaleString();
+      if (typeof isoString !== 'string') return '';
+      try {
+        const normalizedDate = isoString.replace(/(\.\d{3})\d+Z$/, '$1Z');
+        const date = new Date(normalizedDate);
+        return date.toLocaleString('ru-RU', {
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+      } catch (e) {
+        console.error('Ошибка форматирования даты:', e);
+        return isoString.split('.')[0].replace('T', ' ');
+      }
     }
   }
 };
 </script>
 
 <style scoped>
+.error {
+  color: red;
+  padding: 10px;
+  margin-bottom: 15px;
+}
 .message {
   margin: 15px 0;
-  padding: 10px;
-  border: 1px solid #eee;
-  border-radius: 5px;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fff;
+}
+.message-author {
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #2c3e50;
 }
 .message-content {
-  margin-bottom: 5px;
+  margin-bottom: 10px;
+  white-space: pre-line;
 }
 .message-meta {
   font-size: 0.8em;
   color: #7f8c8d;
+  display: flex;
+  justify-content: space-between;
 }
 </style>

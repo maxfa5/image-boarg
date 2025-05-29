@@ -1,7 +1,14 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 
-const app = createApp(App)
-app.use(router)
-app.mount('#app')
+// Правильный порядок:
+const app = createApp(App)  // 1. Создаем приложение
+
+const pinia = createPinia()  // 2. Создаем экземпляр Pinia
+
+app.use(pinia)  // 3. Устанавливаем Pinia
+app.use(router)  // 4. Устанавливаем роутер
+
+app.mount('#app')  // 5. Монтируем приложение
