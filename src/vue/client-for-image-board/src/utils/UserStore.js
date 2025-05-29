@@ -1,52 +1,50 @@
-// Утилиты для работы с куками
-const setCookie = (name, value) => {
+// Установка куки
+export const setCookie = (name, value, days = 365) => {
   const date = new Date();
-  document.cookie = `${name}=${value};path=/`;
+  date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+  const expires = `expires=${date.toUTCString()}`;
+  document.cookie = `${name}=${encodeURIComponent(value)};${expires};path=/;SameSite=Lax`;
 };
 
-const getCookie = (name) => {
+// Получение куки
+export const getCookie = (name) => {
   const nameEQ = `${name}=`;
   const ca = document.cookie.split(';');
+  
   for (let i = 0; i < ca.length; i++) {
     let c = ca[i];
-    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+    while (c.charAt(0) === ' ') c = c.substring(1);
+    if (c.indexOf(nameEQ) === 0) {
+      return decodeURIComponent(c.substring(nameEQ.length));
+    }
   }
+  
   return null;
 };
 
-const deleteCookie = (name) => {
-  setCookie(name, '', -1);
+// Удаление куки
+export const deleteCookie = (name) => {
+  document.cookie = `${name}=; Max-Age=0; path=/;`;
 };
 
-// Хранилище пользователя
-const UserStore = {
-  // Сохранить данные пользователя
-  setUser(userData) {
-    setCookie('user', JSON.stringify(userData));
-  },
-
-  // Получить данные пользователя
-  getUser() {
-    const user = getCookie('user');
-    return user ? JSON.parse(user) : null;
-  },
-
-  // Получить никнейм
-  getUsername() {
-    const user = this.getUser();
-    return user ? user.username : null;
-  },
-
-  // Проверить авторизацию
-  isAuthenticated() {
-    return !!this.getUser();
-  },
-
-  // Выход
-  logout() {
-    deleteCookie('user');
-  }
+// Получение данных пользователя
+export const getUserData = () => {
+  const userData = getCookie('user_data');
+  return userData ? JSON.parse(userData) : null;
 };
 
-export default UserStore;
+// Получение токена
+export const getAuthToken = () => {
+  return getCookie('auth_token');
+};
+
+// Проверка авторизации
+export const isAuthenticated = () => {
+  return !!getAuthToken();
+};
+
+// Выход из системы
+export const logout = () => {
+  deleteCookie('auth_token');
+  deleteCookie('user_data');
+};

@@ -2,6 +2,7 @@ package org.image_board.controller;
 
 
 import org.image_board.DTO.LoginRequestDTO;
+import org.image_board.DTO.LoginResponseDTO;
 import org.image_board.Utils.JwtUtils;
 import org.image_board.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,8 @@ public class AuthController {
         try {
             if (userService.checkUser(request)) {
                 String token = JwtUtils.generateToken(request.getUsername());
-                return ResponseEntity.ok(token);
+                LoginResponseDTO response = new LoginResponseDTO(token, request.getUsername());
+                return ResponseEntity.ok(response);
             }
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (Exception e) {
