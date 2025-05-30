@@ -134,10 +134,15 @@ export default {
   margin: 0 auto;
   padding: 20px;
 }
-html, body{
-  height: 100%;
+body{
+  min-height: 100%;
   margin: 0; 
+  padding: 0;
   box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: hidden;
+
+  overscroll-behavior: none;
 }
 .footer{
   background-image: url('@/assets/footer.png'); /* Укажите путь к изображению */

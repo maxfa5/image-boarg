@@ -101,7 +101,7 @@ export default {
         }
         reader.readAsDataURL(files[i])
       }
-    },
+    }, 
     removeImage(index) {
       this.uploadedImages.splice(index, 1)
     },
@@ -160,6 +160,7 @@ export default {
   } finally {
     this.isSubmitting = false;
   }
+  window.location.reload();
 },
     resetForm() {
       this.formData = {
